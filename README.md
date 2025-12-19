@@ -14,11 +14,3 @@ Push to GitHub → Settings → Pages → Deploy from branch → `/root`.
 
 ## Safety
 Authorized use only. This website does not perform live scanning.
-
-## Lab Advanced Args
-For lab-only advanced testing, use the **Custom Args** field in Command Builder to append your own arguments. The toolkit avoids providing high-risk presets.
-
-## New
-- Home Lab Mode badge
-- Resume page preview + download
-- History exports (TXT/CSV)

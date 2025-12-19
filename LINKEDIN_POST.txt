@@ -1,13 +1,1 @@
-LinkedIn Post (copy/paste)
-
-🚀 Built a Home Lab Blue Team Tool: Nmap Blue Team Toolkit 🛡️
-
-I created an interactive Nmap command builder (GitHub Pages) designed for authorized blue-team learning:
-✅ Scan Library with categories + tags  
-✅ Command Builder (copy/paste)  
-✅ SOC-style notes + realistic sample outputs  
-✅ Command History with TXT/CSV export (local browser storage)
-
-This is built for education and authorized testing only — the site does not run scans itself.
-
-#BlueTeam #SOC #Nmap #CyberSecurity #HomeLab #DefensiveSecurity
+LinkedIn post included.

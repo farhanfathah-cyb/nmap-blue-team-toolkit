@@ -401,8 +401,7 @@ const STORE = {
   target: "nmap_target",
   settings: "nmap_settings_v1",
   theme: "nmap_theme",
-  selectedScan: "nmap_selected_scan_id",
-  customArgs: "nmap_custom_args_v1"
+  selectedScan: "nmap_selected_scan_id"
 };
 
 function loadSettings(){ try{ return JSON.parse(localStorage.getItem(STORE.settings)||"{}"); }catch{ return {}; } }
@@ -413,18 +412,9 @@ function getTarget(){ const tEl=el("target"); const live=tEl?tEl.value:""; retur
 function setTarget(v){ localStorage.setItem(STORE.target,(v||"").trim()); const tEl=el("target"); if(tEl && tEl.value!==v) tEl.value=v; }
 function setSelectedScanId(id){ localStorage.setItem(STORE.selectedScan,id||""); }
 function getSelectedScanId(){ return localStorage.getItem(STORE.selectedScan)||""; }
-function getCustomArgs(){ return (localStorage.getItem(STORE.customArgs)||"").trim(); }
-function setCustomArgs(v){ localStorage.setItem(STORE.customArgs,(v||"").trim()); const c=el("customArgs"); if(c && c.value!==v) c.value=v; }
 
 function initTheme(){ const saved=localStorage.getItem(STORE.theme)||"dark"; document.documentElement.dataset.theme=(saved==="light")?"light":"dark"; const btn=el("themeToggle"); if(btn) btn.textContent=(document.documentElement.dataset.theme==="light")?"☀️":"🌙"; }
 function toggleTheme(){ const cur=document.documentElement.dataset.theme==="light"?"light":"dark"; const nxt=cur==="light"?"dark":"light"; document.documentElement.dataset.theme=nxt; localStorage.setItem(STORE.theme,nxt); const btn=el("themeToggle"); if(btn) btn.textContent=(nxt==="light")?"☀️":"🌙"; }
-
-function sanitizeCustomArgs(s){
-  const x=(s||"").trim();
-  if(!x) return "";
-  const ok=/^[a-zA-Z0-9\s._,:\-/=]+$/.test(x);
-  return ok ? x : "";
-}
 
 function escapeForShell(t){ const s=(t||"").trim(); if(!s) return ""; return /^[a-zA-Z0-9.\-_:\/]+$/.test(s)?s:""; }
 function getSettingsFlags(){ const f=[]; if(getSetting("noDNS")) f.push("-n"); if(getSetting("treatUp")) f.push("-Pn"); if(getSetting("t2")) f.push("-T2"); if(getSetting("maxRate")) f.push("--max-rate 100"); if(getSetting("maxRetries")) f.push("--max-retries 2"); if(getSetting("hostTimeout")) f.push("--host-timeout 2m"); return f; }
@@ -432,15 +422,14 @@ function findScanById(id){ return SCANS.find(s=>s.id===id)||null; }
 
 function buildCommand(scan){
   if(!scan) return "Select a scan to generate a command…";
-const target=escapeForShell(getTarget());
+  if(scan.locked) return "⚠️ This scan is learning-only. The toolkit does not generate a runnable command preset.";
+  const target=escapeForShell(getTarget());
   if(!target) return "Enter a valid target (letters/numbers/dot/dash/CIDR) to generate a safe command…";
   const parts=[];
   if(getSetting("useSudo")) parts.push("sudo");
   parts.push("nmap");
   parts.push(...(scan.cmd||[]));
   parts.push(...getSettingsFlags());
-  const ca = sanitizeCustomArgs(getCustomArgs());
-  if(ca) parts.push(...ca.split(/\s+/));
   parts.push(target);
   return parts.join(" ");
 }
@@ -504,25 +493,58 @@ function renderList(){
   if(el("scanCount")) el("scanCount").textContent = "Scans loaded: " + items.length;
 }
 
-
+function maybeSaveCommand(){
+  const scan = state.selected;
+  if(!scan) return;
+  const entry = {
+    ts: Date.now(),
+    scanId: scan.id,
+    scanName: scan.name,
+    target: getTarget(),
+    command: (el("cmd") ? el("cmd").textContent : buildCommand(scan))
+  };
+  const list = loadHistory();
+  list.push(entry);
+  saveHistory(list);
+}
 
 function renderHistory(){
   const histEl = el("history");
-  if(!histEl) return;
+  const diffEl = el("diff");
+  if (!histEl) return;
+
   const list = loadHistory();
-  if(!list.length){
-    histEl.innerHTML = "<p class='muted'>No commands saved yet.</p>";
+  if (!list.length){
+    histEl.innerHTML = "<div class='muted'>No commands saved yet.</div>";
+    if (diffEl) diffEl.textContent = "—";
     return;
   }
+
   histEl.innerHTML = list.slice().reverse().map(item => `
-    <div class="card mt">
-      <b>${item.scanName}</b>
-      <div class="muted">${new Date(item.ts).toLocaleString()}</div>
-      <div class="muted">Target: ${item.target || "-"}</div>
-      <code>${item.command}</code>
+    <div style="border-bottom:1px solid #223044; padding:10px 0;">
+      <div><b>${item.scanName}</b> <span class="muted">• ${new Date(item.ts).toLocaleString()}</span></div>
+      <div class="muted" style="margin-top:6px;"><b>Target:</b> ${item.target || "(not set)"} </div>
+      <div class="muted"><b>Command:</b> <code>${item.command}</code></div>
     </div>
   `).join("");
+
+  if (!diffEl) return;
+  if (list.length < 2){
+    diffEl.textContent = "Save one more command to compare.";
+    return;
+  }
+  const a = (list[list.length - 2].command || "").split(/\s+/);
+  const b = (list[list.length - 1].command || "").split(/\s+/);
+  const aSet = new Set(a);
+  const bSet = new Set(b);
+  const removed = a.filter(x => x && !bSet.has(x)).slice(0, 40);
+  const added   = b.filter(x => x && !aSet.has(x)).slice(0, 40);
+  let out = "";
+  removed.forEach(x => out += `- ${x}\n`);
+  added.forEach(x => out += `+ ${x}\n`);
+  diffEl.textContent = out.trim() || "(No obvious token changes detected)";
 }
+
   histEl.innerHTML = list.slice().reverse().map(item=>`
     <div style="border-bottom:1px solid var(--border); padding:10px 0;">
       <div><b>${item.scanName}</b> <span class="muted">• ${new Date(item.ts).toLocaleString()}</span></div>
@@ -554,9 +576,6 @@ function bind(){
   // hydrate target
   const tEl=el("target");
   if(tEl){ tEl.value=getTarget(); tEl.addEventListener("input",()=>setTarget(tEl.value)); tEl.addEventListener("change",()=>setTarget(tEl.value)); }
-  const caEl=el("customArgs");
-  const refreshCmd = () => { const scan = state.selected || findScanById(getSelectedScanId()); if(scan && el("cmd")) el("cmd").textContent = buildCommand(scan); };
-  if(caEl){ caEl.value=getCustomArgs(); caEl.addEventListener("input",()=>{ setCustomArgs(caEl.value); refreshCmd(); }); caEl.addEventListener("change",()=>{ setCustomArgs(caEl.value); refreshCmd(); }); }
 
   // settings
   ["useSudo","saveOutputs","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"].forEach(id=>{ const c=el(id); if(!c) return; c.checked=getSetting(id); c.onchange=()=>setSetting(id,c.checked); });
@@ -566,10 +585,8 @@ function bind(){
   if(el("scanSelect")) el("scanSelect").onchange=()=>{ const id=el("scanSelect").value; if(!id) return; const scan=findScanById(id); if(scan) renderSelected(scan); };
 
   if(el("copyCmd")) el("copyCmd").onclick=()=>copyText(el("cmd").textContent||"");
-  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||""); maybeSaveOutput(); renderHistory(); };
+  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||"");  renderHistory(); };
   if(el("clearHistory")) el("clearHistory").onclick=()=>{ localStorage.removeItem(HIST_KEY); renderHistory(); };
-  if(el("exportTxt")) el("exportTxt").onclick=exportHistoryTxt;
-  if(el("exportCsv")) el("exportCsv").onclick=exportHistoryCsv;
 
   const selectedId=getSelectedScanId();
   const scan=selectedId?findScanById(selectedId):null;
@@ -578,25 +595,15 @@ function bind(){
   if(el("scanCards")) renderList();
   if(el("history")) renderHistory();
   if(el("dashCount")) el("dashCount").textContent="Scans available: "+SCANS.length;
+  const exTxt = el("exportTxt");
+  if (exTxt) exTxt.addEventListener("click", exportHistoryTxt);
+  const exCsv = el("exportCsv");
+  if (exCsv) exCsv.addEventListener("click", exportHistoryCsv);
+
 }
 
 initTheme();
 document.addEventListener("DOMContentLoaded", bind);
-
-
-function maybeSaveCommand(){
-  if(!state.selected) return;
-  const entry = {
-    ts: Date.now(),
-    scanId: state.selected.id,
-    scanName: state.selected.name,
-    target: getTarget(),
-    command: el("cmd") ? el("cmd").textContent : ""
-  };
-  const list = loadHistory();
-  list.push(entry);
-  saveHistory(list);
-}
 
 function downloadTextFile(filename, content){
   const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
