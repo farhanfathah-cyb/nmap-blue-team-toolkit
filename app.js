@@ -337,7 +337,7 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
   // ---------- LEARNING-ONLY (Defensive understanding; no runnable presets) ----------
   {
     id: "learning_null_scan",
-    name: "NULL Scan (Learning-only)",
+    name: "NULL Scan (Learning)",
     category: "incident",
     tags: ["learning","stealth","tcp"],
     locked: true,
@@ -351,7 +351,7 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
   },
   {
     id: "learning_xmas_scan",
-    name: "XMAS Scan (Learning-only)",
+    name: "XMAS Scan (Learning)",
     category: "incident",
     tags: ["learning","stealth","tcp"],
     locked: true,
@@ -365,7 +365,7 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
   },
   {
     id: "learning_ack_scan",
-    name: "ACK Scan (Learning-only)",
+    name: "ACK Scan (Learning)",
     category: "incident",
     tags: ["learning","firewall","mapping"],
     locked: true,
@@ -379,7 +379,7 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
   },
   {
     id: "learning_firewall_evasion",
-    name: "Firewall Evasion Concepts (Learning-only)",
+    name: "Firewall Evasion Concepts (Learning)",
     category: "incident",
     tags: ["learning","evasion","defense"],
     locked: true,
@@ -401,7 +401,8 @@ const STORE = {
   target: "nmap_target",
   settings: "nmap_settings_v1",
   theme: "nmap_theme",
-  selectedScan: "nmap_selected_scan_id"
+  selectedScan: "nmap_selected_scan_id",
+  customArgs: "nmap_custom_args_v1"
 };
 
 function loadSettings(){ try{ return JSON.parse(localStorage.getItem(STORE.settings)||"{}"); }catch{ return {}; } }
@@ -412,9 +413,18 @@ function getTarget(){ const tEl=el("target"); const live=tEl?tEl.value:""; retur
 function setTarget(v){ localStorage.setItem(STORE.target,(v||"").trim()); const tEl=el("target"); if(tEl && tEl.value!==v) tEl.value=v; }
 function setSelectedScanId(id){ localStorage.setItem(STORE.selectedScan,id||""); }
 function getSelectedScanId(){ return localStorage.getItem(STORE.selectedScan)||""; }
+function getCustomArgs(){ return (localStorage.getItem(STORE.customArgs)||"").trim(); }
+function setCustomArgs(v){ localStorage.setItem(STORE.customArgs,(v||"").trim()); const c=el("customArgs"); if(c && c.value!==v) c.value=v; }
 
 function initTheme(){ const saved=localStorage.getItem(STORE.theme)||"dark"; document.documentElement.dataset.theme=(saved==="light")?"light":"dark"; const btn=el("themeToggle"); if(btn) btn.textContent=(document.documentElement.dataset.theme==="light")?"☀️":"🌙"; }
 function toggleTheme(){ const cur=document.documentElement.dataset.theme==="light"?"light":"dark"; const nxt=cur==="light"?"dark":"light"; document.documentElement.dataset.theme=nxt; localStorage.setItem(STORE.theme,nxt); const btn=el("themeToggle"); if(btn) btn.textContent=(nxt==="light")?"☀️":"🌙"; }
+
+function sanitizeCustomArgs(s){
+  const x=(s||"").trim();
+  if(!x) return "";
+  const ok=/^[a-zA-Z0-9\s._,:\-/=]+$/.test(x);
+  return ok ? x : "";
+}
 
 function escapeForShell(t){ const s=(t||"").trim(); if(!s) return ""; return /^[a-zA-Z0-9.\-_:\/]+$/.test(s)?s:""; }
 function getSettingsFlags(){ const f=[]; if(getSetting("noDNS")) f.push("-n"); if(getSetting("treatUp")) f.push("-Pn"); if(getSetting("t2")) f.push("-T2"); if(getSetting("maxRate")) f.push("--max-rate 100"); if(getSetting("maxRetries")) f.push("--max-retries 2"); if(getSetting("hostTimeout")) f.push("--host-timeout 2m"); return f; }
@@ -422,14 +432,15 @@ function findScanById(id){ return SCANS.find(s=>s.id===id)||null; }
 
 function buildCommand(scan){
   if(!scan) return "Select a scan to generate a command…";
-  if(scan.locked) return "⚠️ This scan is learning-only. The toolkit does not generate a runnable command preset.";
-  const target=escapeForShell(getTarget());
+const target=escapeForShell(getTarget());
   if(!target) return "Enter a valid target (letters/numbers/dot/dash/CIDR) to generate a safe command…";
   const parts=[];
   if(getSetting("useSudo")) parts.push("sudo");
   parts.push("nmap");
   parts.push(...(scan.cmd||[]));
   parts.push(...getSettingsFlags());
+  const ca = sanitizeCustomArgs(getCustomArgs());
+  if(ca) parts.push(...ca.split(/\s+/));
   parts.push(target);
   return parts.join(" ");
 }
@@ -537,6 +548,9 @@ function bind(){
   // hydrate target
   const tEl=el("target");
   if(tEl){ tEl.value=getTarget(); tEl.addEventListener("input",()=>setTarget(tEl.value)); tEl.addEventListener("change",()=>setTarget(tEl.value)); }
+  const caEl=el("customArgs");
+  const refreshCmd = () => { const scan = state.selected || findScanById(getSelectedScanId()); if(scan && el("cmd")) el("cmd").textContent = buildCommand(scan); };
+  if(caEl){ caEl.value=getCustomArgs(); caEl.addEventListener("input",()=>{ setCustomArgs(caEl.value); refreshCmd(); }); caEl.addEventListener("change",()=>{ setCustomArgs(caEl.value); refreshCmd(); }); }
 
   // settings
   ["useSudo","saveOutputs","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"].forEach(id=>{ const c=el(id); if(!c) return; c.checked=getSetting(id); c.onchange=()=>setSetting(id,c.checked); });
