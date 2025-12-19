@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
-  <link rel="stylesheet" href="styles.css?v=v4" />
+  <link rel="stylesheet" href="styles.css?v=v5" />
 </head>
-<body>
+<body data-page="target">
 <header class="hero">
   <div class="hero-overlay"></div>
-<header class="top">
+  <header class="top">
     <div class="brand">
       <div class="shield">🛡️</div>
       <div>
@@ -21,9 +21,8 @@
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
       <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
-      
       <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
       <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
 
@@ -32,75 +31,70 @@
       <a href="target.html" data-nav="target">Target</a>
       <a href="scans.html" data-nav="scans">Scan Library</a>
       <a href="builder.html" data-nav="builder">Command Builder</a>
-      <a href="results.html" data-nav="results">Results & SOC</a>
+      <a href="results.html" data-nav="results">Results &amp; SOC</a>
       <a href="history.html" data-nav="history">History</a>
-      <a href="resume.html" data-nav="resume">Resume</a>
-          <a href="learning.html" data-nav="learning">Learning</a>
+      <a href="learning.html" data-nav="learning">Learning</a>
     </nav>
-
+  </header>
 </header>
+
 <main class="wrap">
 
 <section class="card">
-  <h2>Target</h2>
-  <p class="muted">Enter an IP, hostname, or CIDR block. This is stored locally in your browser for use across pages.</p>
-  <div class="row">
-    <input id="target" class="input" type="text" placeholder="e.g., 192.168.1.10 or scanme.nmap.org or 10.0.0.0/24" />
-    <button id="exampleTarget" class="btn" title="Paste a safe example target">Example</button>
-  </div>
-
-  <div class="grid">
-    <label class="check"><input type="checkbox" id="useSudo"> Prefix with <code>sudo</code></label>
-    <label class="check"><input type="checkbox" id="saveOutputs"> Save outputs</label>
-    <label class="check"><input type="checkbox" id="noDNS"> No DNS (<code>-n</code>)</label>
-    <label class="check"><input type="checkbox" id="treatUp"> Treat as up (<code>-Pn</code>)</label>
-  </div>
-
-  <h3 class="mt">Safety Controls (Defensive)</h3>
-  <div class="grid">
-    <label class="check"><input type="checkbox" id="t2"> Conservative timing (<code>-T2</code>)</label>
-    <label class="check"><input type="checkbox" id="maxRate"> Limit rate (<code>--max-rate 100</code>)</label>
-    <label class="check"><input type="checkbox" id="maxRetries"> Fewer retries (<code>--max-retries 2</code>)</label>
-    <label class="check"><input type="checkbox" id="hostTimeout"> Host timeout (<code>--host-timeout 2m</code>)</label>
-  </div>
-
-  <p class="note">Tip: Set your target and safety controls here once. Other pages will use the same saved settings.</p>
-</section>
-
-
-<div class="wizard-nav">
-  <a class="btn ghost" href="index.html">← Back: Dashboard</a>
-  <a class="btn" href="scans.html">Next: Scan Library →</a>
-</div>
-
-<footer class="foot">
-      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
-      <a class="link" href="#" id="quickGuide">Quick Guide</a>
-    </footer>
-</main>
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-card">
-      <div class="row space">
-        <h2 id="modalTitle">Legal Notice</h2>
-        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
-      </div>
-      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
-      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
-      <p>Log and document activity in approved lab or test environments.</p>
-      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-      <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+  <div class="row space">
+    <div>
+      <h2>Target</h2>
+      <p class="muted">Set a target (IP / hostname / CIDR). Stored locally in your browser for convenience.</p>
+    </div>
+    <div class="wizard-nav">
+      <a class="btn ghost" href="index.html">← Back: Dashboard</a>
+      <a class="btn primary" href="scans.html">Next: Scan Library →</a>
     </div>
   </div>
 
-  <script>
-    (function(){
-      const key = "target";
-      document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.nav === key) a.classList.add('active');
-      });
-    })();
-  </script>
+  <div class="two">
+    <div>
+      <label class="small muted">Target</label>
+      <input id="target" class="input" type="text" placeholder="e.g., 192.168.1.10 or 10.0.0.0/24" style="width:100%"/>
+      <p class="muted small mt">Tip: Only safe characters are accepted for command generation (letters, numbers, dot, dash, CIDR).</p>
+    </div>
+    <div>
+      <label class="small muted">Safety / Preferences</label>
+      <div class="card" style="margin:8px 0 0 0; padding:12px">
+        <div class="row"><input type="checkbox" id="useSudo"/> <label for="useSudo">Use sudo (Linux)</label></div>
+        <div class="row"><input type="checkbox" id="noDNS"/> <label for="noDNS">-n (No DNS)</label></div>
+        <div class="row"><input type="checkbox" id="treatUp"/> <label for="treatUp">-Pn (Treat hosts as up)</label></div>
+        <div class="row"><input type="checkbox" id="t2"/> <label for="t2">-T2 (Polite timing)</label></div>
+        <div class="row"><input type="checkbox" id="maxRate"/> <label for="maxRate">--max-rate 100</label></div>
+        <div class="row"><input type="checkbox" id="maxRetries"/> <label for="maxRetries">--max-retries 2</label></div>
+        <div class="row"><input type="checkbox" id="hostTimeout"/> <label for="hostTimeout">--host-timeout 2m</label></div>
+        <div class="row"><input type="checkbox" id="saveOutputs"/> <label for="saveOutputs">Save outputs to History when copying output</label></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<script src="app.js?v=v4"></script>
+
+<footer class="foot">
+  © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
+  <a class="link" href="#" id="quickGuide">Quick Guide</a>
+</footer>
+</main>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="row space">
+      <h2 id="modalTitle">Legal Notice</h2>
+      <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+    </div>
+    <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
+    <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
+    <p>Log and document activity in approved lab or test environments.</p>
+    <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+    <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+  </div>
+</div>
+
+<script src="app.js?v=v5"></script>
 </body>
 </html>

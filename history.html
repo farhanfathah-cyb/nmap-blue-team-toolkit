@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
-  <link rel="stylesheet" href="styles.css?v=v4" />
+  <link rel="stylesheet" href="styles.css?v=v5" />
 </head>
-<body>
+<body data-page="history">
 <header class="hero">
   <div class="hero-overlay"></div>
-<header class="top">
+  <header class="top">
     <div class="brand">
       <div class="shield">🛡️</div>
       <div>
@@ -21,9 +21,8 @@
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
       <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
-      
       <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
       <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
 
@@ -32,75 +31,60 @@
       <a href="target.html" data-nav="target">Target</a>
       <a href="scans.html" data-nav="scans">Scan Library</a>
       <a href="builder.html" data-nav="builder">Command Builder</a>
-      <a href="results.html" data-nav="results">Results & SOC</a>
+      <a href="results.html" data-nav="results">Results &amp; SOC</a>
       <a href="history.html" data-nav="history">History</a>
-      <a href="resume.html" data-nav="resume">Resume</a>
-          <a href="learning.html" data-nav="learning">Learning</a>
+      <a href="learning.html" data-nav="learning">Learning</a>
     </nav>
-
+  </header>
 </header>
+
 <main class="wrap">
 
 <section class="card">
   <div class="row space">
     <div>
-      <h2>Saved History</h2>
-      <p class="muted">Enable “Save outputs” in Target settings. Each time you copy output, it saves locally.</p>
+      <h2>History</h2>
+      <p class="muted">Saved outputs (local browser storage). Use for comparisons and audit trails.</p>
     </div>
-    <button id="clearHistory" class="btn ghost">Clear</button>
+    <div class="wizard-nav">
+      <a class="btn ghost" href="results.html">← Back: Results</a>
+      <a class="btn primary" href="scans.html">Back to Scan Library →</a>
+    </div>
   </div>
 
-  <div class="two-col">
-    <div>
-      <h3>Saved Entries</h3>
-      <div id="history" class="panel muted">No saved outputs yet.</div>
-    </div>
-    <div>
-      <h3>Compare (Last two)</h3>
-      <div class="panel">
-        <div class="muted">Shows what changed between the most recent two saves.</div>
-        <div class="codebox mt">
-          <pre id="diff" class="code">—</pre>
-        </div>
-      </div>
-    </div>
+  <div class="row">
+    <button id="clearHistory" class="btn ghost">Clear History</button>
+    <span class="muted small">Tip: Saving happens when you click “Copy Output (and Save)” and “Save outputs” is enabled on Target page.</span>
   </div>
+
+  <h3 class="mt">Saved Runs</h3>
+  <div id="history" class="card" style="margin:10px 0 0 0"></div>
+
+  <h3 class="mt">Diff (Last two)</h3>
+  <pre id="diff">—</pre>
 </section>
 
 
-<div class="wizard-nav">
-  <a class="btn ghost" href="results.html">← Back: Results & SOC</a>
-  <a class="btn" href="resume.html">Next: Resume →</a>
+<footer class="foot">
+  © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
+  <a class="link" href="#" id="quickGuide">Quick Guide</a>
+</footer>
+</main>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="row space">
+      <h2 id="modalTitle">Legal Notice</h2>
+      <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+    </div>
+    <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
+    <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
+    <p>Log and document activity in approved lab or test environments.</p>
+    <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+    <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+  </div>
 </div>
 
-<footer class="foot">
-      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
-      <a class="link" href="#" id="quickGuide">Quick Guide</a>
-    </footer>
-</main>
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-card">
-      <div class="row space">
-        <h2 id="modalTitle">Legal Notice</h2>
-        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
-      </div>
-      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
-      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
-      <p>Log and document activity in approved lab or test environments.</p>
-      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-      <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
-    </div>
-  </div>
-
-  <script>
-    (function(){
-      const key = "history";
-      document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.nav === key) a.classList.add('active');
-      });
-    })();
-  </script>
-
-<script src="app.js?v=v4"></script>
+<script src="app.js?v=v5"></script>
 </body>
 </html>
