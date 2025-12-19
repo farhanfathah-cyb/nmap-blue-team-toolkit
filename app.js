@@ -501,12 +501,13 @@ function maybeSaveCommand(){
     scanId: scan.id,
     scanName: scan.name,
     target: getTarget(),
-    command: (el("cmd") ? el("cmd").textContent : buildCommand(scan))
+    command: el("cmd") ? el("cmd").textContent : buildCommand(scan)
   };
   const list = loadHistory();
   list.push(entry);
   saveHistory(list);
 }
+
 
 function renderHistory(){
   const histEl = el("history");
@@ -545,20 +546,6 @@ function renderHistory(){
   diffEl.textContent = out.trim() || "(No obvious token changes detected)";
 }
 
-  histEl.innerHTML = list.slice().reverse().map(item=>`
-    <div style="border-bottom:1px solid var(--border); padding:10px 0;">
-      <div><b>${item.scanName}</b> <span class="muted">• ${new Date(item.ts).toLocaleString()}</span></div>
-      <div class="muted" style="margin-top:6px;"><b>Target:</b> ${item.target||"(not set)"}</div>
-      <div class="muted"><b>Command:</b> <code>${item.command}</code></div>
-    </div>`).join("");
-  if(list.length<2){ diffEl.textContent="Save one more output to compare."; return; }
-  const a=list[list.length-2].output.split("\n"); const b=list[list.length-1].output.split("\n");
-  const aSet=new Set(a), bSet=new Set(b);
-  const removed=a.filter(l=>l.trim() && !bSet.has(l)).slice(0,25);
-  const added=b.filter(l=>l.trim() && !aSet.has(l)).slice(0,25);
-  let out=""; removed.forEach(l=>out+=`- ${l}\n`); added.forEach(l=>out+=`+ ${l}\n`);
-  diffEl.textContent=out.trim()||"(No obvious line changes detected)";
-}
 
 function bind(){
   // modal
@@ -595,11 +582,6 @@ function bind(){
   if(el("scanCards")) renderList();
   if(el("history")) renderHistory();
   if(el("dashCount")) el("dashCount").textContent="Scans available: "+SCANS.length;
-  const exTxt = el("exportTxt");
-  if (exTxt) exTxt.addEventListener("click", exportHistoryTxt);
-  const exCsv = el("exportCsv");
-  if (exCsv) exCsv.addEventListener("click", exportHistoryCsv);
-
 }
 
 initTheme();
