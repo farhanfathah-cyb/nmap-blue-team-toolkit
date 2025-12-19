@@ -588,24 +588,6 @@ function bind(){
 initTheme();
 document.addEventListener("DOMContentLoaded", bind);
 
-// ===== Custom Scans (Local, per-browser) =====
-const CUSTOM_SCANS_KEY = "nmap_blue_team_custom_scans_v1";
-
-function loadCustomScans(){
-  try { return JSON.parse(localStorage.getItem(CUSTOM_SCANS_KEY) || "[]"); }
-  catch { return []; }
-}
-function saveCustomScans(list){
-  localStorage.setItem(CUSTOM_SCANS_KEY, JSON.stringify(list || []));
-}
-function mergeScansWithCustom(){
-  const custom = loadCustomScans();
-  // Avoid duplicates by id
-  const existing = new Set(SCANS.map(s => s.id));
-  const merged = SCANS.slice();
-  custom.forEach(s => { if(!existing.has(s.id)) merged.push(s); });
-  return merged;
-}
 
 function downloadHistoryTxt(){
   const list = loadHistory ? loadHistory() : [];
