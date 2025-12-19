@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<!-- Header and nav are loaded via shared layout style -->
+<header class="hero">
+  <div class="hero-overlay"></div>
+  <header class="top">
+    <div class="brand">
+      <div class="shield">🛡️</div>
+      <div>
+        <h1>Nmap Blue Team Toolkit</h1>
+        <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+        <p class="sub">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only) • Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
+      <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
+      <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <button id="openLegal" class="btn">Legal Notice</button>
+    </div>
+  </header>
+
+  <nav class="nav" aria-label="Site navigation">
+    <a href="index.html" data-nav="index">Dashboard</a>
+    <a href="target.html" data-nav="target">Target</a>
+    <a href="scans.html" data-nav="scans">Scan Library</a>
+    <a href="builder.html" data-nav="builder">Command Builder</a>
+    <a href="results.html" data-nav="results">Results &amp; SOC</a>
+    <a href="history.html" data-nav="history">History</a>
+    <a href="resume.html" data-nav="resume">Resume</a>
+    <a href="learning.html" data-nav="learning" class="active">Learning</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>Learning: Scan Types & Defensive Detection</h2>
+    <p class="muted">
+      This page explains additional scan types and how defenders detect them. 
+      For safety, the toolkit may show some items as <b>Learning-only</b> and will not generate runnable commands for them.
+    </p>
+
+    <div class="panel">
+      <h3>Key idea</h3>
+      <div class="muted">
+        Blue teams care less about “how to run it” and more about:
+        <ul>
+          <li>What traffic patterns it creates</li>
+          <li>What logs/telemetry should capture it</li>
+          <li>How to reduce exposure and alert on abnormal behavior</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col mt">
+      <div class="panel">
+        <h3>Abnormal TCP Flags (NULL / XMAS concepts)</h3>
+        <div class="muted">
+          <ul>
+            <li><b>What it is:</b> TCP packets with unusual flag combinations.</li>
+            <li><b>Defender signals:</b> IDS “TCP flags anomaly”, firewall invalid-state drops, repeated probes across many ports.</li>
+            <li><b>Defenses:</b> Stateful inspection, drop invalid packets, rate-limit and alert on sweeps.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Firewall Rule Mapping (ACK concept)</h3>
+        <div class="muted">
+          <ul>
+            <li><b>What it is:</b> Probing to infer whether filtering is happening.</li>
+            <li><b>Defender signals:</b> ACK packets without established sessions, repeated attempts across ports.</li>
+            <li><b>Defenses:</b> Enforce state tracking, log drops, restrict exposed services, alert on scan-rate thresholds.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel mt">
+      <h3>Practical defensive checklist</h3>
+      <div class="muted">
+        <ul>
+          <li>Keep an allowlist of approved scanner IPs and maintenance windows.</li>
+          <li>Enable firewall/IDS logs and centralize in SIEM.</li>
+          <li>Alert on port sweeps (many ports, many hosts, short time).</li>
+          <li>Harden exposure: close unused ports, segment networks, restrict admin ports.</li>
+          <li>Baseline regularly and compare drift (your History page helps).</li>
+        </ul>
+      </div>
+    </div>
+  
+    <div class="panel mt">
+      <h3>Defensive Lab Exercises (Ethical Learning)</h3>
+      <div class="muted">
+        Use these in a <b>legal lab</b> (your own VMs / CTF / explicit permission). The goal is to practice <b>detection + triage</b>, not bypassing defenses.
+      </div>
+
+      <div class="two-col mt">
+        <div class="panel">
+          <h3>Exercise 1 — “What alert should fire?”</h3>
+          <div class="muted">
+            <ul>
+              <li>Pick any scan from <b>Scan Library</b> and run it in your lab.</li>
+              <li>Write a SIEM rule idea: what fields would you match? (src IP, dst IP, dst ports, rate).</li>
+              <li>Define a threshold: “X ports in Y seconds” or “X hosts in Y minutes”.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Exercise 2 — “Baseline vs Change”</h3>
+          <div class="muted">
+            <ul>
+              <li>Run a baseline scan today and save output.</li>
+              <li>Make a controlled change (start/stop a service in the lab).</li>
+              <li>Run again and use <b>History → Compare</b> to identify drift.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col mt">
+        <div class="panel">
+          <h3>Exercise 3 — “Triage Playbook”</h3>
+          <div class="muted">
+            For each open port found, answer:
+            <ul>
+              <li>Is this expected for this host role?</li>
+              <li>Is it reachable from the internet or only internal?</li>
+              <li>What patch level / version is running?</li>
+              <li>What is the containment action if suspicious?</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Exercise 4 — “Log Sources”</h3>
+          <div class="muted">
+            Map the scan traffic to telemetry:
+            <ul>
+              <li>Firewall: allow/deny + reason</li>
+              <li>IDS/IPS: signature hits (e.g., port sweep)</li>
+              <li>Host logs: service auth failures, web access logs</li>
+              <li>NetFlow: connection rate and fan-out</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        ✅ Deliverable: Create a one-page PDF or markdown “SOC Triage Note” with:
+        target scope, observed ports, suspected intent (benign/malicious), evidence (logs), and recommended action.
+      </div>
+    </div>
+
+  </section>
+
+  
+<div class="wizard-nav">
+  <a class="btn ghost" href="resume.html">← Back: Resume</a>
+  <span></span>
+</div>
+
+<footer class="foot">© Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education • <a class="link" id="quickGuide" href="#">Quick Guide</a></footer>
+</main>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="row space">
+      <h2>Legal Notice</h2>
+      <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+    </div>
+    <p class="muted"><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
+    <p class="muted">This site provides command templates and sample outputs for learning. No live scanning is performed by this website.</p>
+    <p class="muted">Log and document activity in approved lab or test environments.</p>
+    <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+    <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+  </div>
+</div>
+
+<script>
+  (function(){
+    document.querySelectorAll('.nav a').forEach(a => {
+      if (a.dataset.nav === "learning") a.classList.add('active');
+    });
+  })();
+</script>
+<script src="app.js"></script>
+</body>
+</html>

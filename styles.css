@@ -15,7 +15,7 @@ html, body{height:100%}
 
 body{
   margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
   color:var(--text);
   overflow-x:hidden;
   background:
@@ -279,4 +279,107 @@ html[data-theme="light"] .dash-card{
   color:var(--text);
   border-color:var(--accent);
   box-shadow:0 0 0 1px rgba(91,214,255,.18);
+}
+
+.panel ul{margin:8px 0 0 18px}
+.panel li{margin:6px 0}
+
+/* ---------- UI POLISH ---------- */
+:root{
+  --text:#eef6ff;
+  --muted:#a8bbd2;
+  --accent:#53d7ff;
+  --line: rgba(83,215,255,.20);
+}
+
+html[data-theme="light"]{
+  --text:#071225;
+  --muted:#38506a;
+  --accent:#006dff;
+  --line: rgba(0,109,255,.22);
+}
+
+/* Typography & layout */
+body{line-height:1.55; letter-spacing:.2px}
+h1{font-size:24px}
+h2{font-size:20px}
+h3{font-size:16px}
+.sub{max-width:900px}
+
+.wrap{gap:20px}
+.card{padding:20px}
+.panel{padding:16px}
+.codebox{padding:16px}
+.input,.select{font-size:14px}
+.btn{font-size:14px; font-weight:700}
+
+.note{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: rgba(6,10,18,.55);
+  color: var(--muted);
+}
+html[data-theme="light"] .note{
+  background: rgba(255,255,255,.65);
+}
+
+/* Better links */
+a.link{color:var(--accent); text-decoration:none}
+a.link:hover{text-decoration:underline}
+
+/* Scan list grid polish (if present) */
+.scan-list{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:12px;
+  margin-top:14px;
+}
+@media (max-width:900px){
+  .scan-list{grid-template-columns:1fr}
+}
+
+/* Three / two column helpers */
+.two-col{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:14px;
+}
+.three-col{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:14px;
+}
+@media (max-width:900px){
+  .two-col,.three-col{grid-template-columns:1fr}
+}
+
+/* Check list styling */
+.check{display:flex; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background: rgba(6,10,18,.45)}
+html[data-theme="light"] .check{background: rgba(255,255,255,.6)}
+.check code{opacity:.9}
+
+/* Improve navbar clarity */
+.nav{gap:8px}
+.nav a{font-weight:700}
+
+/* ---------- Wizard navigation ---------- */
+.wizard-nav{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:14px;
+}
+.wizard-nav .btn{
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.wizard-nav .btn.ghost{
+  background: rgba(6,10,18,.35);
+}
+html[data-theme="light"] .wizard-nav .btn.ghost{
+  background: rgba(255,255,255,.6);
 }

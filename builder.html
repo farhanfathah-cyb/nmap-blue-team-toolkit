@@ -1,121 +1,134 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Command Builder • Nmap Blue Team Toolkit</title>
-  <link rel="stylesheet" href="assets/styles.css"/>
-  <meta name="description" content="Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only)"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="index.html">
-        <div class="badge">🛡️</div>
-        <div class="brand-title">
-          <b>Nmap Blue Team Toolkit</b>
-          <span>Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-        </div>
-      </a>
+<header class="hero">
+  <div class="hero-overlay"></div>
+<header class="top">
+    <div class="brand">
+      <div class="shield">🛡️</div>
+      <div>
+        <h1>Nmap Blue Team Toolkit</h1>
+        <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+        <p class="sub">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only) • Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
+      <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
       
-      <nav class="nav">
-        <a href="index.html">Dashboard</a>
-        <a href="target.html">Target</a>
-        <a href="scans.html">Scan Library</a>
-        <a href="builder.html">Command Builder</a>
-        <a href="results.html">Results & SOC</a>
-        <a href="history.html">History</a>
-      </nav>
-    
-      <div class="actions">
-        <a class="btn" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
-        <button id="themeBtn" class="btn" title="Toggle theme">🌙</button>
-        <button id="legalBtn" class="btn">Legal Notice</button>
-      </div>
+      <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
+<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
+
+    <nav class="nav" aria-label="Site navigation">
+      <a href="index.html" data-nav="index">Dashboard</a>
+      <a href="target.html" data-nav="target">Target</a>
+      <a href="scans.html" data-nav="scans">Scan Library</a>
+      <a href="builder.html" data-nav="builder">Command Builder</a>
+      <a href="results.html" data-nav="results">Results & SOC</a>
+      <a href="history.html" data-nav="history">History</a>
+      <a href="resume.html" data-nav="resume">Resume</a>
+          <a href="learning.html" data-nav="learning">Learning</a>
+    </nav>
+
+</header>
+<main class="wrap">
+
+<section class="card" id="socDashboard">
+  <div class="row space">
+    <div>
+      <h2>SOC Dashboard</h2>
+      <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
+    </div>
+    <div class="pill" id="dashCount">Scans available: —</div>
   </div>
-  <div class="container">
 
-<section class="card">
-  <div class="toolbar">
-    <div style="flex:1">
-      <h2 style="margin:0">Command Builder</h2>
-      <div class="small">Copy‑paste command with all settings → then open Results.</div>
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="dash-k">Selected scan</div>
+      <div class="dash-v" id="dashScan">—</div>
     </div>
-    <a class="btn" href="scans.html">← Back to Scan Library</a>
-  </div>
-
-  <div id="builderNotice" class="block"></div>
-
-  <div class="block">
-    <div class="tagrow">
-      <span class="tag cat" id="scanTag">—</span>
-      <span class="tag">Template‑based (no live scanning)</span>
+    <div class="dash-card">
+      <div class="dash-k">Risk</div>
+      <div class="dash-v" id="dashRisk">—</div>
     </div>
-    <h3 id="scanName" style="margin:0">—</h3>
-    <div id="scanDesc" class="small" style="margin-top:6px">—</div>
-
-    <div class="split" style="margin-top:16px">
-      <div>
-        <label class="small">Target</label>
-        <input id="targetInput" type="text" placeholder="e.g., 10.0.0.12 or 10.0.0.0/24"/>
-
-        <div style="margin-top:12px">
-          <label class="small">Domain (only for DNS scans)</label>
-          <input id="domainInput" type="text" placeholder="e.g., example.com"/>
-        </div>
-
-        <div style="margin-top:12px">
-          <label class="small">Command template</label>
-          <textarea id="cmdTemplate" spellcheck="false"></textarea>
-          <div class="small">Placeholders: <span class="kbd">{TARGET}</span> <span class="kbd">{DOMAIN}</span></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="copyrow">
-          <div class="small">Final Command</div>
-          <div style="display:flex; gap:10px">
-            <button id="buildBtn" class="btn">Update</button>
-            <button id="copyBtn" class="btn btn-primary">Copy</button>
-          </div>
-        </div>
-        <div class="codebox" id="finalCmd" style="margin-top:10px"></div>
-
-        <div style="margin-top:14px" class="notice"><b>Reminder:</b> Run commands only with permission.</div>
-
-        <div style="margin-top:14px">
-          <button id="toResultsBtn" class="btn btn-good">Next → Results & SOC</button>
-        </div>
-
-        <div style="margin-top:14px">
-          <div class="small">Sample Output</div>
-          <div class="codebox" id="sampleOut" style="white-space:pre-wrap"></div>
-          <div class="small" style="margin-top:10px">SOC Notes</div>
-          <ul id="socNotes" class="small" style="margin:8px 0 0 18px"></ul>
-        </div>
-      </div>
+    <div class="dash-card">
+      <div class="dash-k">Open ports (from sample)</div>
+      <div class="dash-v" id="dashPorts">—</div>
     </div>
   </div>
 </section>
 
-<script src="assets/builder.js"></script>
 
+<section class="card">
+  <h2>Command Builder</h2>
+  <p class="muted">Uses your saved target & settings from the Target page. Select a scan from the Scan Library page.</p>
+
+  <div class="pill" id="selectedScan">No scan selected</div>
+
+  <label class="label mt">Command</label>
+  <div class="codebox">
+    <pre id="cmd" class="code">Select a scan to generate a command…</pre>
   </div>
 
-  <div id="legalModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Legal Notice">
-    <div class="card modal">
-      <h3>Legal Notice</h3>
-      <p class="small">Authorized use only. Use this toolkit only on systems you own or have explicit permission to test.</p>
-      <p class="small">This site provides command templates and sample outputs for learning. No live scanning is performed by this website.</p>
-      <p class="small">Log and document activity in approved lab or test environments.</p>
-      <div class="notice" style="margin-top:10px"><b>Tip:</b> Add your organization’s acceptable-use policy link here.</div>
-      <div class="modal-actions"><button id="legalClose" class="btn">Close</button></div>
+  <div class="row">
+    <button id="copyCmd" class="btn">Copy Command</button>
+    <button id="reset" class="btn ghost">Reset</button>
+  </div>
+
+  <div class="two-col mt">
+    <div>
+      <h3>Scan Details</h3>
+      <div id="scanDetails" class="panel muted">Select a scan to see details…</div>
+    </div>
+    <div>
+      <h3>MITRE / Controls (Training)</h3>
+      <div id="mapping" class="panel muted">Select a scan to see mapping…</div>
+    </div>
+  </div>
+</section>
+
+
+<div class="wizard-nav">
+  <a class="btn ghost" href="scans.html">← Back: Scan Library</a>
+  <a class="btn" href="results.html">Next: Results & SOC →</a>
+</div>
+
+<footer class="foot">
+      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
+      <a class="link" href="#" id="quickGuide">Quick Guide</a>
+    </footer>
+</main>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="row space">
+        <h2 id="modalTitle">Legal Notice</h2>
+        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+      </div>
+      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
+      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
+      <p>Log and document activity in approved lab or test environments.</p>
+      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+      <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
     </div>
   </div>
 
-  <footer class="container">© Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education • <span class="kbd">v1.1</span></footer>
+  <script>
+    (function(){
+      const key = "builder";
+      document.querySelectorAll('.nav a').forEach(a => {
+        if (a.dataset.nav === key) a.classList.add('active');
+      });
+    })();
+  </script>
 
-  <script src="assets/app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
