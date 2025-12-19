@@ -401,6 +401,7 @@ const STORE = {
   target: "nmap_target",
   settings: "nmap_settings_v1",
   theme: "nmap_theme",
+  customArgs: "nmap_custom_args_v1",
   selectedScan: "nmap_selected_scan_id"
 };
 
@@ -430,6 +431,9 @@ function buildCommand(scan){
   parts.push("nmap");
   parts.push(...(scan.cmd||[]));
   parts.push(...getSettingsFlags());
+  const extra = escapeArgsForShell(getCustomArgs());
+  if (extra) parts.push(...extra.split(/\s+/).filter(Boolean));
+
   parts.push(target);
   return parts.join(" ");
 }
@@ -622,4 +626,23 @@ function downloadHistoryTxt(){
   a.click();
   a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+
+function getCustomArgs(){
+  const aEl = el("customArgs");
+  const live = aEl ? aEl.value : "";
+  return (live && live.trim()) ? live.trim() : (localStorage.getItem(STORE.customArgs) || "");
+}
+function setCustomArgs(val){
+  localStorage.setItem(STORE.customArgs, (val || "").trim());
+  const aEl = el("customArgs");
+  if (aEl && aEl.value !== val) aEl.value = val;
+}
+function escapeArgsForShell(args){
+  // Conservative allowlist: letters, digits, dashes, underscores, dots, commas, colons, slashes, equals, plus
+  // Also allow spaces between flags. Reject suspicious chars like ; & | ` $ ( ) > <
+  const s = (args || "").trim();
+  if(!s) return "";
+  const ok = /^[a-zA-Z0-9\s\-_.:,\/=+]+$/.test(s);
+  return ok ? s : "";
 }
