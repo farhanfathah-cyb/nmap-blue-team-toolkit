@@ -640,3 +640,24 @@ function escapeArgsForShell(args){
   const ok = /^[a-zA-Z0-9\s\-_.:,\/=+]+$/.test(s);
   return ok ? s : "";
 }
+
+function ensureBuilderLiveUpdate(){
+  const caEl = el("customArgs");
+  const cmdEl = el("cmd");
+  if(!caEl || !cmdEl) return;
+
+  // hydrate from storage
+  const stored = localStorage.getItem(STORE.customArgs) || "";
+  if(!caEl.value && stored) caEl.value = stored;
+
+  const refresh = () => {
+    setCustomArgs(caEl.value);
+    if(state.selected){
+      const built = buildCommand(state.selected);
+      typeIntoPre(cmdEl, built, 3);
+    }
+  };
+
+  caEl.addEventListener("input", refresh);
+  caEl.addEventListener("change", refresh);
+}
