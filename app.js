@@ -494,30 +494,29 @@ function renderList(){
 }
 
 function maybeSaveCommand(){
-  const scan = state.selected;
+  const scan = state.selected || findScanById(getSelectedScanId());
   if(!scan) return;
   const entry = {
     ts: Date.now(),
     scanId: scan.id,
     scanName: scan.name,
-    target: getTarget(),
-    command: el("cmd") ? el("cmd").textContent : buildCommand(scan)
+    target: escapeForShell(getTarget()),
+    command: (el("cmd") ? el("cmd").textContent : buildCommand(scan))
   };
   const list = loadHistory();
   list.push(entry);
   saveHistory(list);
 }
 
-
 function renderHistory(){
   const histEl = el("history");
   const diffEl = el("diff");
-  if (!histEl) return;
+  if(!histEl) return;
 
   const list = loadHistory();
-  if (!list.length){
-    histEl.innerHTML = "<div class='muted'>No commands saved yet.</div>";
-    if (diffEl) diffEl.textContent = "—";
+  if(!list.length){
+    histEl.textContent = "No saved commands yet.";
+    if(diffEl) diffEl.textContent = "—";
     return;
   }
 
@@ -529,17 +528,15 @@ function renderHistory(){
     </div>
   `).join("");
 
-  if (!diffEl) return;
-  if (list.length < 2){
-    diffEl.textContent = "Save one more command to compare.";
-    return;
-  }
+  if(!diffEl) return;
+  if(list.length < 2){ diffEl.textContent = "Save one more command to compare."; return; }
+
   const a = (list[list.length - 2].command || "").split(/\s+/);
   const b = (list[list.length - 1].command || "").split(/\s+/);
-  const aSet = new Set(a);
-  const bSet = new Set(b);
+  const aSet = new Set(a), bSet = new Set(b);
   const removed = a.filter(x => x && !bSet.has(x)).slice(0, 40);
   const added   = b.filter(x => x && !aSet.has(x)).slice(0, 40);
+
   let out = "";
   removed.forEach(x => out += `- ${x}\n`);
   added.forEach(x => out += `+ ${x}\n`);
@@ -571,8 +568,8 @@ function bind(){
   if(el("category")) el("category").onchange=renderList;
   if(el("scanSelect")) el("scanSelect").onchange=()=>{ const id=el("scanSelect").value; if(!id) return; const scan=findScanById(id); if(scan) renderSelected(scan); };
 
-  if(el("copyCmd")) el("copyCmd").onclick=()=>copyText(el("cmd").textContent||"");
-  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||"");  renderHistory(); };
+  if(el("copyCmd")) el("copyCmd").onclick=async()=>{ await copyText(el("cmd").textContent||""); maybeSaveCommand(); renderHistory(); };
+  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||""); };
   if(el("clearHistory")) el("clearHistory").onclick=()=>{ localStorage.removeItem(HIST_KEY); renderHistory(); };
 
   const selectedId=getSelectedScanId();
@@ -587,39 +584,42 @@ function bind(){
 initTheme();
 document.addEventListener("DOMContentLoaded", bind);
 
-function downloadTextFile(filename, content){
-  const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 500);
+// ===== Custom Scans (Local, per-browser) =====
+const CUSTOM_SCANS_KEY = "nmap_blue_team_custom_scans_v1";
+
+function loadCustomScans(){
+  try { return JSON.parse(localStorage.getItem(CUSTOM_SCANS_KEY) || "[]"); }
+  catch { return []; }
 }
-function downloadCsvFile(filename, rows){
-  const esc = (v) => {
-    const s = String(v ?? "");
-    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
-    return s;
-  };
-  const csv = rows.map(r => r.map(esc).join(",")).join("\n");
-  downloadTextFile(filename, csv);
+function saveCustomScans(list){
+  localStorage.setItem(CUSTOM_SCANS_KEY, JSON.stringify(list || []));
 }
-function exportHistoryTxt(){
-  const list = loadHistory();
-  if(!list.length) return alert("No commands saved yet.");
+function mergeScansWithCustom(){
+  const custom = loadCustomScans();
+  // Avoid duplicates by id
+  const existing = new Set(SCANS.map(s => s.id));
+  const merged = SCANS.slice();
+  custom.forEach(s => { if(!existing.has(s.id)) merged.push(s); });
+  return merged;
+}
+
+function downloadHistoryTxt(){
+  const list = loadHistory ? loadHistory() : [];
+  if(!list.length){
+    alert("No saved commands yet.");
+    return;
+  }
   const lines = list.map(x => {
     const ts = new Date(x.ts).toISOString();
     return `[${ts}] ${x.scanName} | target=${x.target||"-"}\n${x.command}\n`;
   }).join("\n");
-  downloadTextFile("nmap_toolkit_history.txt", lines);
-}
-function exportHistoryCsv(){
-  const list = loadHistory();
-  if(!list.length) return alert("No commands saved yet.");
-  const rows = [["timestamp","scanName","target","command"]];
-  list.forEach(x => rows.push([new Date(x.ts).toISOString(), x.scanName, x.target||"", x.command]));
-  downloadCsvFile("nmap_toolkit_history.csv", rows);
+  const blob = new Blob([lines], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "nmap_commands_history.txt";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
 }

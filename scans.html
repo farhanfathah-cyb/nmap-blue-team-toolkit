@@ -37,6 +37,54 @@
 </header>
 <main class="wrap">
 
+
+<section class="card">
+  <div class="row space">
+    <div>
+      <h2>Custom Scan</h2>
+      <p class="muted">Create your own scan preset for your lab. It will appear in the Scan Library on this device (saved in your browser).</p>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:10px;">
+    <div>
+      <label class="muted small">Scan Name</label>
+      <input id="customName" class="input" type="text" placeholder="e.g., My Web Quick Check" />
+    </div>
+    <div>
+      <label class="muted small">Category</label>
+      <select id="customCategory" class="select">
+        <option value="baseline">baseline</option>
+        <option value="discovery">discovery</option>
+        <option value="exposure">exposure</option>
+        <option value="web">web</option>
+        <option value="windows">windows</option>
+        <option value="linux">linux</option>
+        <option value="dns">dns</option>
+        <option value="mail">mail</option>
+        <option value="database">database</option>
+        <option value="incident">incident</option>
+        <option value="audit">audit</option>
+      </select>
+    </div>
+    <div style="grid-column:1/-1;">
+      <label class="muted small">Arguments (no target)</label>
+      <input id="customArgs" class="input" type="text" placeholder="e.g., -sS --top-ports 200 -sV --reason" />
+      <p class="muted small mt">Tip: The toolkit will append the target automatically. Save only flags here.</p>
+    </div>
+    <div style="grid-column:1/-1;">
+      <label class="muted small">Tags (comma-separated)</label>
+      <input id="customTags" class="input" type="text" placeholder="e.g., baseline,web,quick" />
+    </div>
+  </div>
+
+  <div class="row mt" style="gap:10px;">
+    <button id="saveCustomScan" class="btn primary">Add Custom Scan</button>
+    <button id="clearCustomScans" class="btn ghost">Clear Custom Scans</button>
+    <span class="muted small" id="customScanStatus"></span>
+  </div>
+</section>
+
 <section class="card">
   <div class="row space">
     <div>
