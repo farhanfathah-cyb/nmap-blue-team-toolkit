@@ -401,6 +401,7 @@ const STORE = {
   target: "nmap_target",
   settings: "nmap_settings_v1",
   theme: "nmap_theme",
+  customArgs: "nmap_custom_args_v1",
   selectedScan: "nmap_selected_scan_id"
 };
 
@@ -421,18 +422,33 @@ function getSettingsFlags(){ const f=[]; if(getSetting("noDNS")) f.push("-n"); i
 function findScanById(id){ return SCANS.find(s=>s.id===id)||null; }
 
 function buildCommand(scan){
-  if(!scan) return "Select a scan to generate a command…";
-  if(scan.locked) return "⚠️ This scan is learning-only. The toolkit does not generate a runnable command preset.";
-  const target=escapeForShell(getTarget());
-  if(!target) return "Enter a valid target (letters/numbers/dot/dash/CIDR) to generate a safe command…";
-  const parts=[];
-  if(getSetting("useSudo")) parts.push("sudo");
+  if (scan && scan.locked) {
+    return "⚠️ This scan type is shown for defensive learning only. The toolkit does not generate a runnable command for it.";
+  }
+
+  const targetRaw = getTarget();
+  const target = escapeForShell(targetRaw);
+
+  if (!target) {
+    return "Enter a valid target (letters/numbers/dot/dash/CIDR) to generate a safe command…";
+  }
+
+  const parts = [];
+  if (getSetting("useSudo")) parts.push("sudo");
   parts.push("nmap");
-  parts.push(...(scan.cmd||[]));
+
+  if (scan && Array.isArray(scan.cmd)) parts.push(...scan.cmd);
   parts.push(...getSettingsFlags());
+
+  // Custom args from builder (optional)
+  const extra = escapeArgsForShell(getCustomArgs());
+  if (extra) parts.push(...extra.split(/\s+/).filter(Boolean));
+
   parts.push(target);
   return parts.join(" ");
 }
+
+
 
 async function copyText(text){
   try{ await navigator.clipboard.writeText(text); }
@@ -511,40 +527,14 @@ function maybeSaveCommand(){
 function renderHistory(){
   const histEl = el("history");
   const diffEl = el("diff");
-  if (!histEl) return;
+  if(!histEl) return;
 
   const list = loadHistory();
-  if (!list.length){
-    histEl.innerHTML = "<div class='muted'>No commands saved yet.</div>";
-    if (diffEl) diffEl.textContent = "—";
+  if(!list.length){
+    histEl.textContent = "No saved commands yet.";
+    if(diffEl) diffEl.textContent = "—";
     return;
   }
-
-  histEl.innerHTML = list.slice().reverse().map(item => `
-    <div style="border-bottom:1px solid #223044; padding:10px 0;">
-      <div><b>${item.scanName}</b> <span class="muted">• ${new Date(item.ts).toLocaleString()}</span></div>
-      <div class="muted" style="margin-top:6px;"><b>Target:</b> ${item.target || "(not set)"} </div>
-      <div class="muted"><b>Command:</b> <code>${item.command}</code></div>
-    </div>
-  `).join("");
-
-  if (!diffEl) return;
-  if (list.length < 2){
-    diffEl.textContent = "Save one more command to compare.";
-    return;
-  }
-  const a = (list[list.length - 2].command || "").split(/\s+/);
-  const b = (list[list.length - 1].command || "").split(/\s+/);
-  const aSet = new Set(a);
-  const bSet = new Set(b);
-  const removed = a.filter(x => x && !bSet.has(x)).slice(0, 40);
-  const added   = b.filter(x => x && !aSet.has(x)).slice(0, 40);
-  let out = "";
-  removed.forEach(x => out += `- ${x}\n`);
-  added.forEach(x => out += `+ ${x}\n`);
-  diffEl.textContent = out.trim() || "(No obvious token changes detected)";
-}
-
 
   histEl.innerHTML = list.slice().reverse().map(item => `
     <div style="border-bottom:1px solid #223044; padding:10px 0;">
@@ -610,39 +600,9 @@ function bind(){
 initTheme();
 document.addEventListener("DOMContentLoaded", bind);
 
-// ===== Auto-save commands on selection =====
-const AUTO_SAVE_KEY = "nmap_blue_team_last_saved_cmd_v1";
-
-function maybeSaveCommandAuto(scan){
-  if(!scan) return;
-  // Only on pages that show generated command (builder/results)
-  const cmdEl = el("cmd");
-  if(!cmdEl) return;
-
-  const command = cmdEl.textContent || buildCommand(scan);
-  if(!command || command.includes("Enter a valid target")) return;
-
-  const last = sessionStorage.getItem(AUTO_SAVE_KEY) || "";
-  if(last === command) return; // de-dupe
-
-  const entry = {
-    ts: Date.now(),
-    scanId: scan.id,
-    scanName: scan.name,
-    target: getTarget ? getTarget() : "",
-    command
-  };
-
-  try{
-    const list = loadHistory();
-    list.push(entry);
-    saveHistory(list);
-    sessionStorage.setItem(AUTO_SAVE_KEY, command);
-  } catch {}
-}
 
 function downloadHistoryTxt(){
-  const list = loadHistory();
+  const list = loadHistory ? loadHistory() : [];
   if(!list.length){
     alert("No saved commands yet.");
     return;
@@ -660,4 +620,44 @@ function downloadHistoryTxt(){
   a.click();
   a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+
+function getCustomArgs(){
+  const aEl = el("customArgs");
+  const live = aEl ? aEl.value : "";
+  return (live && live.trim()) ? live.trim() : (localStorage.getItem(STORE.customArgs) || "");
+}
+function setCustomArgs(val){
+  localStorage.setItem(STORE.customArgs, (val || "").trim());
+  const aEl = el("customArgs");
+  if (aEl && aEl.value !== val) aEl.value = val;
+}
+function escapeArgsForShell(args){
+  // Conservative allowlist: letters, digits, dashes, underscores, dots, commas, colons, slashes, equals, plus
+  // Also allow spaces between flags. Reject suspicious chars like ; & | ` $ ( ) > <
+  const s = (args || "").trim();
+  if(!s) return "";
+  const ok = /^[a-zA-Z0-9\s\-_.:,\/=+]+$/.test(s);
+  return ok ? s : "";
+}
+
+function ensureBuilderLiveUpdate(){
+  const caEl = el("customArgs");
+  const cmdEl = el("cmd");
+  if(!caEl || !cmdEl) return;
+
+  // hydrate from storage
+  const stored = localStorage.getItem(STORE.customArgs) || "";
+  if(!caEl.value && stored) caEl.value = stored;
+
+  const refresh = () => {
+    setCustomArgs(caEl.value);
+    if(state.selected){
+      const built = buildCommand(state.selected);
+      typeIntoPre(cmdEl, built, 3);
+    }
+  };
+
+  caEl.addEventListener("input", refresh);
+  caEl.addEventListener("change", refresh);
 }
