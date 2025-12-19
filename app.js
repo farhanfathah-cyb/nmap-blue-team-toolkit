@@ -422,21 +422,33 @@ function getSettingsFlags(){ const f=[]; if(getSetting("noDNS")) f.push("-n"); i
 function findScanById(id){ return SCANS.find(s=>s.id===id)||null; }
 
 function buildCommand(scan){
-  if(!scan) return "Select a scan to generate a command…";
-  if(scan.locked) return "⚠️ This scan is learning-only. The toolkit does not generate a runnable command preset.";
-  const target=escapeForShell(getTarget());
-  if(!target) return "Enter a valid target (letters/numbers/dot/dash/CIDR) to generate a safe command…";
-  const parts=[];
-  if(getSetting("useSudo")) parts.push("sudo");
+  if (scan && scan.locked) {
+    return "⚠️ This scan type is shown for defensive learning only. The toolkit does not generate a runnable command for it.";
+  }
+
+  const targetRaw = getTarget();
+  const target = escapeForShell(targetRaw);
+
+  if (!target) {
+    return "Enter a valid target (letters/numbers/dot/dash/CIDR) to generate a safe command…";
+  }
+
+  const parts = [];
+  if (getSetting("useSudo")) parts.push("sudo");
   parts.push("nmap");
-  parts.push(...(scan.cmd||[]));
+
+  if (scan && Array.isArray(scan.cmd)) parts.push(...scan.cmd);
   parts.push(...getSettingsFlags());
+
+  // Custom args from builder (optional)
   const extra = escapeArgsForShell(getCustomArgs());
   if (extra) parts.push(...extra.split(/\s+/).filter(Boolean));
 
   parts.push(target);
   return parts.join(" ");
 }
+
+
 
 async function copyText(text){
   try{ await navigator.clipboard.writeText(text); }
