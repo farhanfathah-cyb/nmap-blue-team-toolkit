@@ -504,12 +504,19 @@ function renderList(){
   if(el("scanCount")) el("scanCount").textContent = "Scans loaded: " + items.length;
 }
 
-function maybeSaveOutput(){
-  if(!getSetting("saveOutputs")) return;
-  const scan=state.selected||findScanById(getSelectedScanId());
+function maybeSaveCommand(){
+  const scan = state.selected || findScanById(getSelectedScanId());
   if(!scan) return;
-  const entry={ts:Date.now(),scanId:scan.id,scanName:scan.name,target:escapeForShell(getTarget()),command:(el("cmd")?el("cmd").textContent:buildCommand(scan)),output:(el("out")?el("out").textContent:(scan.sample||""))};
-  const list=loadHistory(); list.push(entry); saveHistory(list);
+  const entry = {
+    ts: Date.now(),
+    scanId: scan.id,
+    scanName: scan.name,
+    target: escapeForShell(getTarget()),
+    command: (el("cmd") ? el("cmd").textContent : buildCommand(scan))
+  };
+  const list = loadHistory();
+  list.push(entry);
+  saveHistory(list);
 }
 
 function renderHistory(){
@@ -523,13 +530,16 @@ function renderHistory(){
       <div class="muted" style="margin-top:6px;"><b>Target:</b> ${item.target||"(not set)"}</div>
       <div class="muted"><b>Command:</b> <code>${item.command}</code></div>
     </div>`).join("");
-  if(list.length<2){ diffEl.textContent="Save one more output to compare."; return; }
-  const a=list[list.length-2].output.split("\n"); const b=list[list.length-1].output.split("\n");
+  if(list.length<2){ diffEl.textContent="Save one more command to compare."; return; }
+  const a=(list[list.length-2].command||"").split(/\\s+/);
+  const b=(list[list.length-1].command||"").split(/\\s+/);
   const aSet=new Set(a), bSet=new Set(b);
-  const removed=a.filter(l=>l.trim() && !bSet.has(l)).slice(0,25);
-  const added=b.filter(l=>l.trim() && !aSet.has(l)).slice(0,25);
-  let out=""; removed.forEach(l=>out+=`- ${l}\n`); added.forEach(l=>out+=`+ ${l}\n`);
-  diffEl.textContent=out.trim()||"(No obvious line changes detected)";
+  const removed=a.filter(x=>x && !bSet.has(x)).slice(0,40);
+  const added=b.filter(x=>x && !aSet.has(x)).slice(0,40);
+  let out="";
+  removed.forEach(x=>out+=`- ${x}\\n`);
+  added.forEach(x=>out+=`+ ${x}\\n`);
+  diffEl.textContent=out.trim()||"(No obvious token changes detected)";
 }
 
 function bind(){
@@ -559,8 +569,8 @@ function bind(){
   if(el("category")) el("category").onchange=renderList;
   if(el("scanSelect")) el("scanSelect").onchange=()=>{ const id=el("scanSelect").value; if(!id) return; const scan=findScanById(id); if(scan) renderSelected(scan); };
 
-  if(el("copyCmd")) el("copyCmd").onclick=()=>copyText(el("cmd").textContent||"");
-  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||""); maybeSaveOutput(); renderHistory(); };
+  if(el("copyCmd")) el("copyCmd").onclick=async()=>{ await copyText(el("cmd").textContent||""); maybeSaveCommand(); renderHistory(); };
+  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||""); };
   if(el("clearHistory")) el("clearHistory").onclick=()=>{ localStorage.removeItem(HIST_KEY); renderHistory(); };
 
   const selectedId=getSelectedScanId();
