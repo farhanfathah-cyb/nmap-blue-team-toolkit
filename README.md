@@ -28,3 +28,10 @@ Use Nmap only on systems you own or have explicit permission to test.
 - Legal notice modal
 
 **Brand:** Farhan Mohammed Fathah — Cybersecurity Enthusiast
+
+
+## Extras included
+- Tech/circuit animated background (CSS)
+- Dark/Light theme toggle (saved in localStorage)
+- Command typing animation
+- SOC Dashboard snapshot (selected scan, risk, open ports from sample)

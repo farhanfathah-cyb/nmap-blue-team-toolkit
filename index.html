@@ -7,7 +7,9 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="top">
+  <header class="hero">
+  <div class="hero-overlay"></div>
+<header class="top">
     <div class="brand">
       <div class="shield">🛡️</div>
       <div>
@@ -18,11 +20,14 @@
     </div>
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
+      <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
       
       <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-<button id="openLegal" class="btn ghost">Legal Notice</button>
+<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
   </header>
+
 
   <main class="wrap">
     <!-- Target + Settings -->
@@ -82,6 +87,33 @@
       </div>
 
       <div id="scanList" class="scan-list"></div>
+    </section>
+
+
+    <!-- SOC Dashboard -->
+    <section class="card" id="socDashboard">
+      <div class="row space">
+        <div>
+          <h2>SOC Dashboard</h2>
+          <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
+        </div>
+        <div class="pill" id="dashCount">Scans available: —</div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-k">Selected scan</div>
+          <div class="dash-v" id="dashScan">—</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-k">Risk</div>
+          <div class="dash-v" id="dashRisk">—</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-k">Open ports (from sample)</div>
+          <div class="dash-v" id="dashPorts">—</div>
+        </div>
+      </div>
     </section>
 
     <!-- Command Builder -->
@@ -170,6 +202,24 @@
         </div>
       </div>
     </section>
+
+
+    <!-- Resume -->
+    <section class="card" id="resumeSection">
+      <div class="row space">
+        <div>
+          <h2>Resume</h2>
+          <p class="muted">Download my resume (PDF).</p>
+        </div>
+        <a class="btn" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer" download>⬇️ Download Resume</a>
+      </div>
+
+      <div class="panel">
+        <div class="muted"><b>Farhan Mohammed Fathah — Cybersecurity Enthusiast</b></div>
+        <div class="muted" style="margin-top:8px">Tip: You can also add this link to your LinkedIn Featured section.</div>
+      </div>
+    </section>
+
 
     <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •

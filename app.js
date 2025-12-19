@@ -516,6 +516,73 @@ const state = {
   selected: null
 };
 
+// ====== UI Enhancements (Theme toggle, typing effect, dashboard) ======
+let typingTimer = null;
+
+function typeIntoPre(preEl, text, speed=8){
+  if (!preEl) return;
+  if (typingTimer) clearInterval(typingTimer);
+  preEl.textContent = "";
+  let i = 0;
+  typingTimer = setInterval(() => {
+    preEl.textContent += text[i] || "";
+    i++;
+    if (i >= text.length){
+      clearInterval(typingTimer);
+      typingTimer = null;
+    }
+  }, speed);
+}
+
+function parseOpenPortsFromSample(sample){
+  // Extract lines like "22/tcp   open ..."
+  const ports = [];
+  const lines = (sample || "").split("\n");
+  for (const line of lines){
+    const m = line.match(/^(\d+)\/(tcp|udp)\s+open\b/i);
+    if (m) ports.push(`${m[1]}/${m[2].toLowerCase()}`);
+  }
+  return ports.slice(0, 12);
+}
+
+function setDashboard(scan){
+  const dashCount = document.getElementById("dashCount");
+  const dashScan  = document.getElementById("dashScan");
+  const dashRisk  = document.getElementById("dashRisk");
+  const dashPorts = document.getElementById("dashPorts");
+
+  if (dashCount) dashCount.textContent = `Scans available: ${SCANS.length}`;
+
+  if (!scan){
+    if (dashScan) dashScan.textContent = "—";
+    if (dashRisk) dashRisk.textContent = "—";
+    if (dashPorts) dashPorts.textContent = "—";
+    return;
+  }
+
+  const ports = parseOpenPortsFromSample(scan.sample);
+  if (dashScan)  dashScan.textContent  = scan.name;
+  if (dashRisk)  dashRisk.textContent  = scan.risk;
+  if (dashPorts) dashPorts.textContent = ports.length ? ports.join(", ") : "(none found in sample)";
+}
+
+function initTheme(){
+  const saved = localStorage.getItem("nmap_theme") || "dark";
+  document.documentElement.dataset.theme = saved === "light" ? "light" : "dark";
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.textContent = (document.documentElement.dataset.theme === "light") ? "☀️" : "🌙";
+}
+
+function toggleTheme(){
+  const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+  const next = current === "light" ? "dark" : "light";
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem("nmap_theme", next);
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.textContent = (next === "light") ? "☀️" : "🌙";
+}
+
+
 // ====== Helpers ======
 function escapeForShell(target){
   // Basic safety: prevent accidental shell injection in copy/paste commands
@@ -563,12 +630,14 @@ function renderSelected(scan){
   el("scanDetails").textContent = scan.details;
   el("mapping").textContent = scan.mapping;
 
-  el("cmd").textContent = buildCommand(scan);
+  const built = buildCommand(scan);
+  typeIntoPre(el("cmd"), built, 6);
 
   el("out").textContent = scan.sample;
   el("meaning").textContent = scan.meaning;
   el("risk").textContent = scan.risk;
   el("next").textContent = scan.next;
+  setDashboard(scan);
 }
 
 function renderList(){
@@ -693,6 +762,10 @@ function bind(){
     if (e.target.id === "modal") el("modal").classList.add("hidden");
   });
 
+  // theme toggle
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
+
   // quick guide
   el("quickGuide").addEventListener("click", (e) => {
     e.preventDefault();
@@ -741,6 +814,7 @@ function bind(){
     el("meaning").textContent = "—";
     el("risk").textContent = "—";
     el("next").textContent = "—";
+    setDashboard(null);
   });
 
   // history clear
@@ -751,6 +825,8 @@ function bind(){
 }
 
 // ====== Init ======
+initTheme();
+setDashboard(null);
 renderList();
 bind();
 renderHistory();
