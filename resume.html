@@ -39,44 +39,20 @@
 
 </header>
 <main class="wrap">
+<section class="card" id="resumeSection">
+      <div class="row space">
+        <div>
+          <h2>Resume</h2>
+          <p class="muted">Download my resume (PDF).</p>
+        </div>
+        <a class="btn" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer" download>⬇️ Download Resume</a>
+      </div>
 
-<section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
-  </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
-</section>
-
-<section class="card" id="socDashboard">
-  <div class="row space">
-    <div>
-      <h2>SOC Dashboard</h2>
-      <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
-    </div>
-    <div class="pill" id="dashCount">Scans available: —</div>
-  </div>
-
-  <div class="dash-grid">
-    <div class="dash-card">
-      <div class="dash-k">Selected scan</div>
-      <div class="dash-v" id="dashScan">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Risk</div>
-      <div class="dash-v" id="dashRisk">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Open ports (from sample)</div>
-      <div class="dash-v" id="dashPorts">—</div>
-    </div>
-  </div>
-</section>
-
-
+      <div class="panel">
+        <div class="muted"><b>Farhan Mohammed Fathah — Cybersecurity Enthusiast</b></div>
+        <div class="muted" style="margin-top:8px">Tip: You can also add this link to your LinkedIn Featured section.</div>
+      </div>
+    </section>
 <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
       <a class="link" href="#" id="quickGuide">Quick Guide</a>
@@ -98,7 +74,7 @@
 
   <script>
     (function(){
-      const key = "index";
+      const key = "resume";
       document.querySelectorAll('.nav a').forEach(a => {
         if (a.dataset.nav === key) a.classList.add('active');
       });

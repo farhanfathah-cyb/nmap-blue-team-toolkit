@@ -41,41 +41,32 @@
 <main class="wrap">
 
 <section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
-  </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
-</section>
-
-<section class="card" id="socDashboard">
   <div class="row space">
     <div>
-      <h2>SOC Dashboard</h2>
-      <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
+      <h2>Scan Library</h2>
+      <p class="muted">Pick a scan to generate a command and view realistic sample output + SOC notes.</p>
     </div>
-    <div class="pill" id="dashCount">Scans available: —</div>
+    <div class="row">
+      <input id="search" class="input" type="text" placeholder="Search scans (e.g., baseline, ir, web, dns)..." />
+      <select id="category" class="select" aria-label="Filter by category">
+        <option value="all" selected="true">All categories</option>
+        <option value="discovery">Discovery</option>
+        <option value="baseline">Baseline</option>
+        <option value="exposure">Exposure</option>
+        <option value="web">Web</option>
+        <option value="windows">Windows</option>
+        <option value="linux">Linux</option>
+        <option value="dns">DNS</option>
+        <option value="mail">Mail</option>
+        <option value="database">Database</option>
+        <option value="incident">Incident Response</option>
+        <option value="audit">Audit</option>
+      </select>
+    </div>
   </div>
-
-  <div class="dash-grid">
-    <div class="dash-card">
-      <div class="dash-k">Selected scan</div>
-      <div class="dash-v" id="dashScan">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Risk</div>
-      <div class="dash-v" id="dashRisk">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Open ports (from sample)</div>
-      <div class="dash-v" id="dashPorts">—</div>
-    </div>
-  </div>
+  <div id="scanList" class="scan-list"></div>
+  <p class="muted mt">Click any scan card to load it into the builder/results pages.</p>
 </section>
-
 
 <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
@@ -98,7 +89,7 @@
 
   <script>
     (function(){
-      const key = "index";
+      const key = "scans";
       document.querySelectorAll('.nav a').forEach(a => {
         if (a.dataset.nav === key) a.classList.add('active');
       });

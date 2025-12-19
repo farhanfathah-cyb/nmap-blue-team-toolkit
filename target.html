@@ -41,41 +41,30 @@
 <main class="wrap">
 
 <section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
+  <h2>Target</h2>
+  <p class="muted">Enter an IP, hostname, or CIDR block. This is stored locally in your browser for use across pages.</p>
+  <div class="row">
+    <input id="target" class="input" type="text" placeholder="e.g., 192.168.1.10 or scanme.nmap.org or 10.0.0.0/24" />
+    <button id="exampleTarget" class="btn" title="Paste a safe example target">Example</button>
   </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
+
+  <div class="grid">
+    <label class="check"><input type="checkbox" id="useSudo"> Prefix with <code>sudo</code></label>
+    <label class="check"><input type="checkbox" id="saveOutputs"> Save outputs</label>
+    <label class="check"><input type="checkbox" id="noDNS"> No DNS (<code>-n</code>)</label>
+    <label class="check"><input type="checkbox" id="treatUp"> Treat as up (<code>-Pn</code>)</label>
+  </div>
+
+  <h3 class="mt">Safety Controls (Defensive)</h3>
+  <div class="grid">
+    <label class="check"><input type="checkbox" id="t2"> Conservative timing (<code>-T2</code>)</label>
+    <label class="check"><input type="checkbox" id="maxRate"> Limit rate (<code>--max-rate 100</code>)</label>
+    <label class="check"><input type="checkbox" id="maxRetries"> Fewer retries (<code>--max-retries 2</code>)</label>
+    <label class="check"><input type="checkbox" id="hostTimeout"> Host timeout (<code>--host-timeout 2m</code>)</label>
+  </div>
+
+  <p class="note">Tip: Set your target and safety controls here once. Other pages will use the same saved settings.</p>
 </section>
-
-<section class="card" id="socDashboard">
-  <div class="row space">
-    <div>
-      <h2>SOC Dashboard</h2>
-      <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
-    </div>
-    <div class="pill" id="dashCount">Scans available: —</div>
-  </div>
-
-  <div class="dash-grid">
-    <div class="dash-card">
-      <div class="dash-k">Selected scan</div>
-      <div class="dash-v" id="dashScan">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Risk</div>
-      <div class="dash-v" id="dashRisk">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Open ports (from sample)</div>
-      <div class="dash-v" id="dashPorts">—</div>
-    </div>
-  </div>
-</section>
-
 
 <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
@@ -98,7 +87,7 @@
 
   <script>
     (function(){
-      const key = "index";
+      const key = "target";
       document.querySelectorAll('.nav a').forEach(a => {
         if (a.dataset.nav === key) a.classList.add('active');
       });

@@ -257,3 +257,26 @@ html[data-theme="light"] .dash-card{
 .codebox pre{
   font-size:13px;
 }
+
+/* ---------- Navbar ---------- */
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.nav a{
+  text-decoration:none;
+  color:var(--muted);
+  border:1px solid var(--line);
+  background: rgba(6,10,18,.55);
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+}
+.nav a:hover{border-color:var(--accent); color:var(--text)}
+.nav a.active{
+  color:var(--text);
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(91,214,255,.18);
+}

@@ -41,41 +41,30 @@
 <main class="wrap">
 
 <section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
-  </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
-</section>
-
-<section class="card" id="socDashboard">
   <div class="row space">
     <div>
-      <h2>SOC Dashboard</h2>
-      <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
+      <h2>Saved History</h2>
+      <p class="muted">Enable “Save outputs” in Target settings. Each time you copy output, it saves locally.</p>
     </div>
-    <div class="pill" id="dashCount">Scans available: —</div>
+    <button id="clearHistory" class="btn ghost">Clear</button>
   </div>
 
-  <div class="dash-grid">
-    <div class="dash-card">
-      <div class="dash-k">Selected scan</div>
-      <div class="dash-v" id="dashScan">—</div>
+  <div class="two-col">
+    <div>
+      <h3>Saved Entries</h3>
+      <div id="history" class="panel muted">No saved outputs yet.</div>
     </div>
-    <div class="dash-card">
-      <div class="dash-k">Risk</div>
-      <div class="dash-v" id="dashRisk">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Open ports (from sample)</div>
-      <div class="dash-v" id="dashPorts">—</div>
+    <div>
+      <h3>Compare (Last two)</h3>
+      <div class="panel">
+        <div class="muted">Shows what changed between the most recent two saves.</div>
+        <div class="codebox mt">
+          <pre id="diff" class="code">—</pre>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-
 
 <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
@@ -98,7 +87,7 @@
 
   <script>
     (function(){
-      const key = "index";
+      const key = "history";
       document.querySelectorAll('.nav a').forEach(a => {
         if (a.dataset.nav === key) a.classList.add('active');
       });

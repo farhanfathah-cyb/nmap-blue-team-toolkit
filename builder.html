@@ -40,17 +40,6 @@
 </header>
 <main class="wrap">
 
-<section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
-  </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
-</section>
-
 <section class="card" id="socDashboard">
   <div class="row space">
     <div>
@@ -77,6 +66,34 @@
 </section>
 
 
+<section class="card">
+  <h2>Command Builder</h2>
+  <p class="muted">Uses your saved target & settings from the Target page. Select a scan from the Scan Library page.</p>
+
+  <div class="pill" id="selectedScan">No scan selected</div>
+
+  <label class="label mt">Command</label>
+  <div class="codebox">
+    <pre id="cmd" class="code">Select a scan to generate a command…</pre>
+  </div>
+
+  <div class="row">
+    <button id="copyCmd" class="btn">Copy Command</button>
+    <button id="reset" class="btn ghost">Reset</button>
+  </div>
+
+  <div class="two-col mt">
+    <div>
+      <h3>Scan Details</h3>
+      <div id="scanDetails" class="panel muted">Select a scan to see details…</div>
+    </div>
+    <div>
+      <h3>MITRE / Controls (Training)</h3>
+      <div id="mapping" class="panel muted">Select a scan to see mapping…</div>
+    </div>
+  </div>
+</section>
+
 <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
       <a class="link" href="#" id="quickGuide">Quick Guide</a>
@@ -98,7 +115,7 @@
 
   <script>
     (function(){
-      const key = "index";
+      const key = "builder";
       document.querySelectorAll('.nav a').forEach(a => {
         if (a.dataset.nav === key) a.classList.add('active');
       });

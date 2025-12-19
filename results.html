@@ -40,17 +40,6 @@
 </header>
 <main class="wrap">
 
-<section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
-  </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
-</section>
-
 <section class="card" id="socDashboard">
   <div class="row space">
     <div>
@@ -77,6 +66,42 @@
 </section>
 
 
+<section class="card">
+  <div class="row space">
+    <div>
+      <h2>Sample Results & SOC Notes</h2>
+      <p class="muted">Realistic examples for blue-team learners. No live scanning is performed by this website.</p>
+    </div>
+    <button id="copyOut" class="btn ghost">Copy Output</button>
+  </div>
+
+  <label class="label">Sample Output</label>
+  <div class="codebox">
+    <pre id="out" class="code">Select a scan to view a sample output…</pre>
+  </div>
+
+  <div class="three-col mt">
+    <div class="panel">
+      <h3>What it means</h3>
+      <div id="meaning" class="muted">—</div>
+    </div>
+    <div class="panel">
+      <h3>Risk</h3>
+      <div id="risk" class="muted">—</div>
+    </div>
+    <div class="panel">
+      <h3>Next steps (SOC triage)</h3>
+      <div id="next" class="muted">—</div>
+    </div>
+  </div>
+
+  <div class="row mt">
+    <button id="reset" class="btn ghost">Reset</button>
+    <a class="btn" href="builder.html">Go to Builder</a>
+    <a class="btn" href="scans.html">Pick another Scan</a>
+  </div>
+</section>
+
 <footer class="foot">
       © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
       <a class="link" href="#" id="quickGuide">Quick Guide</a>
@@ -98,7 +123,7 @@
 
   <script>
     (function(){
-      const key = "index";
+      const key = "results";
       document.querySelectorAll('.nav a').forEach(a => {
         if (a.dataset.nav === key) a.classList.add('active');
       });

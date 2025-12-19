@@ -511,10 +511,59 @@ PORT    STATE SERVICE  VERSION
 
 // ====== DOM ======
 const el = (id) => document.getElementById(id);
-
 const state = {
   selected: null
 };
+
+// ====== Persistence (target + settings across pages) ======
+const STORE = {
+  target: "nmap_target",
+  settings: "nmap_settings_v1",
+  theme: "nmap_theme"
+};
+
+function loadSettings(){
+  try { return JSON.parse(localStorage.getItem(STORE.settings) || "{}"); }
+  catch { return {}; }
+}
+function saveSettings(obj){
+  localStorage.setItem(STORE.settings, JSON.stringify(obj || {}));
+}
+function getTarget(){
+  const tEl = el("target");
+  const live = tEl ? tEl.value : "";
+  return (live && live.trim()) ? live.trim() : (localStorage.getItem(STORE.target) || "");
+}
+function setTarget(val){
+  localStorage.setItem(STORE.target, (val || "").trim());
+  const tEl = el("target");
+  if (tEl && tEl.value !== val) tEl.value = val;
+}
+function getSetting(id){
+  const c = el(id);
+  if (c && typeof c.checked === "boolean") return !!c.checked;
+  const s = loadSettings();
+  return !!s[id];
+}
+function setSetting(id, value){
+  const s = loadSettings();
+  s[id] = !!value;
+  saveSettings(s);
+  const c = el(id);
+  if (c && typeof c.checked === "boolean") c.checked = !!value;
+}
+function hydrateControls(){
+  // Apply stored settings onto checkboxes that exist on the current page
+  const s = loadSettings();
+  Object.keys(s).forEach(k => {
+    const c = el(k);
+    if (c && typeof c.checked === "boolean") c.checked = !!s[k];
+  });
+  const t = localStorage.getItem(STORE.target) || "";
+  const tEl = el("target");
+  if (tEl && !tEl.value) tEl.value = t;
+}
+
 
 // ====== UI Enhancements (Theme toggle, typing effect, dashboard) ======
 let typingTimer = null;
@@ -567,7 +616,7 @@ function setDashboard(scan){
 }
 
 function initTheme(){
-  const saved = localStorage.getItem("nmap_theme") || "dark";
+  const saved = localStorage.getItem(STORE.theme) || "dark";
   document.documentElement.dataset.theme = saved === "light" ? "light" : "dark";
   const btn = document.getElementById("themeToggle");
   if (btn) btn.textContent = (document.documentElement.dataset.theme === "light") ? "☀️" : "🌙";
@@ -577,7 +626,7 @@ function toggleTheme(){
   const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
   const next = current === "light" ? "dark" : "light";
   document.documentElement.dataset.theme = next;
-  localStorage.setItem("nmap_theme", next);
+  localStorage.setItem(STORE.theme, next);
   const btn = document.getElementById("themeToggle");
   if (btn) btn.textContent = (next === "light") ? "☀️" : "🌙";
 }
@@ -595,17 +644,17 @@ function escapeForShell(target){
 
 function getSettingsFlags(){
   const flags = [];
-  if (el("noDNS").checked) flags.push("-n");
-  if (el("treatUp").checked) flags.push("-Pn");
-  if (el("t2").checked) flags.push("-T2");
-  if (el("maxRate").checked) flags.push("--max-rate 100");
-  if (el("maxRetries").checked) flags.push("--max-retries 2");
-  if (el("hostTimeout").checked) flags.push("--host-timeout 2m");
+  if (getSetting("noDNS")) flags.push("-n");
+  if (getSetting("treatUp")) flags.push("-Pn");
+  if (getSetting("t2")) flags.push("-T2");
+  if (getSetting("maxRate")) flags.push("--max-rate 100");
+  if (getSetting("maxRetries")) flags.push("--max-retries 2");
+  if (getSetting("hostTimeout")) flags.push("--host-timeout 2m");
   return flags;
 }
 
 function buildCommand(scan){
-  const targetRaw = el("target").value;
+  const targetRaw = getTarget();
   const target = escapeForShell(targetRaw);
 
   if (!target) {
@@ -613,7 +662,7 @@ function buildCommand(scan){
   }
 
   const parts = [];
-  if (el("useSudo").checked) parts.push("sudo");
+  if (getSetting("useSudo")) parts.push("sudo");
   parts.push("nmap");
 
   parts.push(...scan.cmd);
@@ -651,7 +700,10 @@ function renderList(){
     return inCat && inSearch;
   });
 
-  el("scanList").innerHTML = items.map(s => `
+  const listEl = el("scanList");
+  if (!listEl) return;
+
+  listEl.innerHTML = items.map(s => `
     <div class="scan" data-id="${s.id}">
       <div class="title">${s.name}</div>
       <div class="meta">
@@ -707,14 +759,18 @@ function simpleDiff(aLines, bLines){
 }
 
 function renderHistory(){
+  const histEl = el("history");
+  const diffEl = el("diff");
+  if (!histEl || !diffEl) return;
+
   const list = loadHistory();
   if (!list.length){
-    el("history").textContent = "No saved outputs yet.";
-    el("diff").textContent = "—";
+    histEl.textContent = "No saved outputs yet.";
+    diffEl.textContent = "—";
     return;
   }
 
-  el("history").innerHTML = list.slice().reverse().map(item => `
+  histEl.innerHTML = list.slice().reverse().map(item => `
     <div style="border-bottom:1px solid #223044; padding:10px 0;">
       <div><b>${item.scanName}</b> <span class="muted">• ${new Date(item.ts).toLocaleString()}</span></div>
       <div class="muted" style="margin-top:6px;"><b>Target:</b> ${item.target || "(not set)"} </div>
@@ -726,14 +782,14 @@ function renderHistory(){
     const a = list[list.length - 2].output.split("\n");
     const b = list[list.length - 1].output.split("\n");
     const changes = simpleDiff(a, b);
-    el("diff").textContent = changes || "(No obvious line changes detected)";
+    diffEl.textContent = changes || "(No obvious line changes detected)";
   } else {
-    el("diff").textContent = "Save one more output to compare.";
+    diffEl.textContent = "Save one more output to compare.";
   }
 }
 
 function maybeSaveOutput(){
-  if (!el("saveOutputs").checked) return;
+  if (!getSetting("saveOutputs")) return;
   const scan = state.selected;
   if (!scan) return;
 
@@ -747,6 +803,10 @@ function maybeSaveOutput(){
     output: el("out").textContent
   };
 
+  const histEl = el("history");
+  const diffEl = el("diff");
+  if (!histEl || !diffEl) return;
+
   const list = loadHistory();
   list.push(entry);
   saveHistory(list);
@@ -755,70 +815,119 @@ function maybeSaveOutput(){
 
 // ====== Events ======
 function bind(){
-  // modal
-  el("openLegal").addEventListener("click", () => el("modal").classList.remove("hidden"));
-  el("closeLegal").addEventListener("click", () => el("modal").classList.add("hidden"));
-  el("modal").addEventListener("click", (e) => {
-    if (e.target.id === "modal") el("modal").classList.add("hidden");
-  });
+  // modal (if present)
+  const openLegal = el("openLegal");
+  const closeLegal = el("closeLegal");
+  const modal = el("modal");
+  if (openLegal && modal) openLegal.addEventListener("click", () => modal.classList.remove("hidden"));
+  if (closeLegal && modal) closeLegal.addEventListener("click", () => modal.classList.add("hidden"));
+  if (modal) modal.addEventListener("click", (e) => { if (e.target.id === "modal") modal.classList.add("hidden"); });
 
   // theme toggle
-  const themeBtn = document.getElementById("themeToggle");
+  const themeBtn = el("themeToggle");
   if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
 
-  // quick guide
-  el("quickGuide").addEventListener("click", (e) => {
+  // quick guide (optional)
+  const qg = el("quickGuide");
+  if (qg) qg.addEventListener("click", (e) => {
     e.preventDefault();
-    alert("Quick Guide:\\n1) Enter a target\\n2) Pick a scan\\n3) Copy command\\n4) Run only with permission\\n5) Use sample outputs + SOC notes for training");
+    alert("Quick Guide:
+1) Set target & safety options
+2) Pick a scan
+3) Copy command
+4) Run only with permission
+5) Use sample outputs + SOC notes for training");
   });
+
+  // hydrate stored controls onto this page
+  hydrateControls();
+  setDashboard(state.selected);
+
+  // target input persistence
+  const targetEl = el("target");
+  if (targetEl){
+    targetEl.addEventListener("input", () => setTarget(targetEl.value));
+    targetEl.addEventListener("change", () => setTarget(targetEl.value));
+  }
 
   // example target
-  el("exampleTarget").addEventListener("click", () => {
-    el("target").value = "192.168.1.10";
-    if (state.selected) el("cmd").textContent = buildCommand(state.selected);
+  const ex = el("exampleTarget");
+  if (ex){
+    ex.addEventListener("click", () => {
+      setTarget("192.168.1.10");
+      if (state.selected){
+        const built = buildCommand(state.selected);
+        typeIntoPre(el("cmd"), built, 6);
+      }
+    });
+  }
+
+  // settings persistence checkboxes
+  const settingIds = ["useSudo","saveOutputs","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"];
+  settingIds.forEach(id => {
+    const c = el(id);
+    if (!c) return;
+    // initialize from storage if not already
+    c.checked = getSetting(id);
+    c.addEventListener("change", () => setSetting(id, c.checked));
   });
 
-  // search/filter
-  el("search").addEventListener("input", renderList);
-  el("category").addEventListener("change", renderList);
+  // search/filter (scan library page)
+  const search = el("search");
+  const category = el("category");
+  if (search) search.addEventListener("input", renderList);
+  if (category) category.addEventListener("change", renderList);
 
-  // settings -> update command live
-  ["target","useSudo","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"].forEach(id => {
-    el(id).addEventListener("input", () => {
-      if (state.selected) el("cmd").textContent = buildCommand(state.selected);
-    });
-    el(id).addEventListener("change", () => {
-      if (state.selected) el("cmd").textContent = buildCommand(state.selected);
-    });
+  // settings that impact command live (builder page)
+  const liveIds = ["target","useSudo","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"];
+  liveIds.forEach(id => {
+    const c = el(id);
+    if (!c) return;
+    const handler = () => {
+      if (state.selected && el("cmd")){
+        const built = buildCommand(state.selected);
+        typeIntoPre(el("cmd"), built, 6);
+      }
+    };
+    c.addEventListener("input", handler);
+    c.addEventListener("change", handler);
   });
 
   // copy buttons
-  el("copyCmd").addEventListener("click", async () => {
-    await copyText(el("cmd").textContent);
+  const copyCmdBtn = el("copyCmd");
+  if (copyCmdBtn) copyCmdBtn.addEventListener("click", async () => {
+    const cmdEl = el("cmd");
+    if (cmdEl) await copyText(cmdEl.textContent);
   });
 
-  el("copyOut").addEventListener("click", async () => {
-    await copyText(el("out").textContent);
+  const copyOutBtn = el("copyOut");
+  if (copyOutBtn) copyOutBtn.addEventListener("click", async () => {
+    const outEl = el("out");
+    if (!outEl) return;
+    await copyText(outEl.textContent);
     maybeSaveOutput();
   });
 
-  // reset
-  el("reset").addEventListener("click", () => {
-    el("target").value = "";
+  // reset (builder/results page)
+  const resetBtn = el("reset");
+  if (resetBtn) resetBtn.addEventListener("click", () => {
+    setTarget("");
     state.selected = null;
-    el("selectedScan").textContent = "No scan selected";
-    el("cmd").textContent = "Select a scan to generate a command…";
-    el("scanDetails").textContent = "Select a scan to see details…";
-    el("mapping").textContent = "Select a scan to see mapping…";
-    el("out").textContent = "Select a scan to view a sample output…";
-    el("meaning").textContent = "—";
-    el("risk").textContent = "—";
-    el("next").textContent = "—";
+    const selectedScan = el("selectedScan");
+    if (selectedScan) selectedScan.textContent = "No scan selected";
+    if (el("cmd")) el("cmd").textContent = "Select a scan to generate a command…";
+    if (el("scanDetails")) el("scanDetails").textContent = "Select a scan to see details…";
+    if (el("mapping")) el("mapping").textContent = "Select a scan to see mapping…";
+    if (el("out")) el("out").textContent = "Select a scan to view a sample output…";
+    if (el("meaning")) el("meaning").textContent = "—";
+    if (el("risk")) el("risk").textContent = "—";
+    if (el("next")) el("next").textContent = "—";
     setDashboard(null);
   });
 
   // history clear
-  el("clearHistory").addEventListener("click", () => {
+  const clearBtn = el("clearHistory");
+  if (clearBtn) clearBtn.addEventListener("click", () => {
     localStorage.removeItem(HIST_KEY);
     renderHistory();
   });
