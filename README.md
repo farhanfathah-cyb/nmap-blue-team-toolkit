@@ -1,37 +1,30 @@
 # Nmap Blue Team Toolkit (GitHub Pages)
 
-Interactive **command builder** + **sample outputs** + **SOC triage guidance** for Nmap.  
-✅ Intended for **authorized security testing** and **blue-team education**.  
-🚫 This website does **not** perform scanning.
+**Brand:** Farhan Mohammed Fathah — Cybersecurity Enthusiast
 
-## Features
-- Scan Library (Discovery, Enumeration, UDP, Web, Windows/SMB, Reporting)
-- Command Builder (target + safe options like timing/rate/output files)
-- Sample outputs to teach interpretation
-- “What it means” + “Next steps” per scan
-- Clean UI (no frameworks) — works great on GitHub Pages
+✅ Command builder + Copy  
+✅ Blue-team scan library (defensive templates)  
+✅ Sample outputs + SOC notes (training)  
+✅ Settings (sudo, -n, -Pn, safety controls)  
+✅ Save outputs + History + Compare (localStorage)
 
-## Quick start (local)
-1. Download the repo
-2. Open `index.html` in a browser  
-   (or run a local server for module imports):
-   ```bash
-   python3 -m http.server 8080
-   ```
-3. Visit `http://localhost:8080`
+## Run locally
+Just open `index.html` in a browser.
 
-## Deploy on GitHub Pages
-1. Create a GitHub repo (public recommended)
-2. Upload all files from this package
-3. Go to **Settings → Pages**
-4. Source: **Deploy from a branch**
-5. Branch: `main` / folder: `/ (root)`
-6. Save — your site will appear at GitHub Pages URL
+## Deploy (GitHub Pages)
+1. Push files to a GitHub repo
+2. Settings → Pages → Deploy from branch
+3. Branch: `main` / root
 
-## Customize
-- Change footer “Your Name” in `index.html`
-- Add/remove scans in `assets/scans.json`
-- Update style in `assets/styles.css`
+## Safety
+This project does not run scans. It generates command templates and shows realistic sample outputs for learning.
+Use Nmap only on systems you own or have explicit permission to test.
 
-## Legal
-Use only on systems you own or have explicit permission to test.
+
+## Branding locations
+- Browser tab title
+- Header subtitle + top-right badge
+- Footer
+- Legal notice modal
+
+**Brand:** Farhan Mohammed Fathah — Cybersecurity Enthusiast

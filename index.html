@@ -3,131 +3,195 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nmap Blue Team Toolkit</title>
-  <meta name="description" content="Interactive Nmap command builder for authorized security testing and blue-team education. Includes sample outputs and SOC triage guidance." />
-  <link rel="stylesheet" href="./assets/styles.css" />
+  <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="container header">
+  <header class="top">
     <div class="brand">
-      <div class="logo" aria-hidden="true">🛡️</div>
+      <div class="shield">🛡️</div>
       <div>
         <h1>Nmap Blue Team Toolkit</h1>
-        <p class="subtitle">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only)</p>
+        <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+        <p class="sub">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only) • Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
       </div>
     </div>
-
     <div class="header-actions">
-      <a class="btn ghost" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
-      <button id="btnLegal" class="btn">Legal Notice</button>
+      <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
+      
+      <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
+<button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
   </header>
 
-  <main class="container grid">
+  <main class="wrap">
+    <!-- Target + Settings -->
     <section class="card">
       <h2>Target</h2>
       <p class="muted">Enter an IP, hostname, or CIDR block.</p>
 
       <div class="row">
-        <input id="targetInput" type="text" placeholder="e.g., 192.168.1.1 or 192.168.1.0/24 or example.com" autocomplete="off" />
-        <button id="btnPasteExample" class="btn ghost" title="Paste a safe example target">Example</button>
+        <input id="target" class="input" type="text" placeholder="e.g., 192.168.1.10 or scanme.nmap.org or 10.0.0.0/24" />
+        <button id="exampleTarget" class="btn" title="Paste a safe example target">Example</button>
       </div>
 
-      <div class="row">
-        <label class="chip"><input type="checkbox" id="optSudo" /> Prefix with <code>sudo</code></label>
-        <label class="chip"><input type="checkbox" id="optOutput" /> Save outputs</label>
-        <label class="chip"><input type="checkbox" id="optNoDns" /> No DNS (<code>-n</code>)</label>
-        <label class="chip"><input type="checkbox" id="optPn" /> Treat as up (<code>-Pn</code>)</label>
+      <div class="grid">
+        <label class="check"><input type="checkbox" id="useSudo"> Prefix with <code>sudo</code></label>
+        <label class="check"><input type="checkbox" id="saveOutputs"> Save outputs</label>
+        <label class="check"><input type="checkbox" id="noDNS"> No DNS (<code>-n</code>)</label>
+        <label class="check"><input type="checkbox" id="treatUp"> Treat as up (<code>-Pn</code>)</label>
       </div>
 
-      <div class="divider"></div>
-
-      <h2>Scan Library</h2>
-      <div class="row">
-        <input id="searchInput" type="text" placeholder="Search scans (e.g., smb, tls, top ports, udp)" />
-        <select id="categorySelect" aria-label="Filter by category">
-          <option value="all">All categories</option>
-        </select>
+      <h3 class="mt">Safety Controls (Defensive)</h3>
+      <div class="grid">
+        <label class="check"><input type="checkbox" id="t2"> Conservative timing (<code>-T2</code>)</label>
+        <label class="check"><input type="checkbox" id="maxRate"> Limit rate (<code>--max-rate 100</code>)</label>
+        <label class="check"><input type="checkbox" id="maxRetries"> Fewer retries (<code>--max-retries 2</code>)</label>
+        <label class="check"><input type="checkbox" id="hostTimeout"> Host timeout (<code>--host-timeout 2m</code>)</label>
       </div>
 
-      <div id="scanList" class="scan-list" role="list"></div>
+      <p class="note">
+        Note: This toolkit intentionally avoids evasion features. Use only in authorized environments and keep logs.
+      </p>
     </section>
 
+    <!-- Scan Library -->
+    <section class="card">
+      <div class="row space">
+        <div>
+          <h2>Scan Library</h2>
+          <p class="muted">Pick a scan to generate a command and view realistic sample output + SOC notes.</p>
+        </div>
+        <div class="row">
+          <input id="search" class="input" type="text" placeholder="Search scans (e.g., baseline, ir, web, dns)..." />
+          <select id="category" class="select" aria-label="Filter by category">
+            <option value="all">All categories</option>
+            <option value="discovery">Discovery</option>
+            <option value="baseline">Baseline</option>
+            <option value="exposure">Exposure</option>
+            <option value="web">Web</option>
+            <option value="windows">Windows</option>
+            <option value="linux">Linux</option>
+            <option value="dns">DNS</option>
+            <option value="mail">Mail</option>
+            <option value="database">Database</option>
+            <option value="incident">Incident Response</option>
+            <option value="audit">Audit</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="scanList" class="scan-list"></div>
+    </section>
+
+    <!-- Command Builder -->
     <section class="card">
       <h2>Command Builder</h2>
-      <p class="muted">Select a scan to generate a command. Then copy/paste into your terminal in an authorized lab environment.</p>
+      <p class="muted">Select a scan to generate the command. Copy/paste in an authorized lab environment.</p>
 
-      <div class="cmd-box">
-        <div class="cmd-toolbar">
-          <span class="tag" id="selectedScanTag">No scan selected</span>
-          <div class="cmd-actions">
-            <button id="btnCopyCmd" class="btn">Copy Command</button>
-            <button id="btnReset" class="btn ghost">Reset</button>
-          </div>
-        </div>
-        <pre class="cmd" id="cmdOutput">Select a scan to generate a command…</pre>
+      <div class="pill" id="selectedScan">No scan selected</div>
+
+      <label class="label mt">Command</label>
+      <div class="codebox">
+        <pre id="cmd" class="code">Select a scan to generate a command…</pre>
       </div>
 
-      <div class="divider"></div>
-
-      <h2>Sample Results & SOC Notes</h2>
-      <p class="muted">These are example outputs to help blue-team learners interpret results. They are <strong>not</strong> live scans.</p>
-
-      <div class="results">
-        <div class="result-card">
-          <h3>Sample Output</h3>
-          <div class="result-toolbar">
-            <button id="btnCopyOut" class="btn ghost">Copy Output</button>
-          </div>
-          <pre class="out" id="sampleOutput">Select a scan to view a sample output…</pre>
-        </div>
-
-        <div class="result-card">
-          <h3>What it means</h3>
-          <ul id="meaningList" class="bullets"></ul>
-        </div>
-
-        <div class="result-card">
-          <h3>Next steps (SOC triage)</h3>
-          <ul id="nextStepsList" class="bullets"></ul>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <h2>Safety Controls (Defensive)</h2>
-      <p class="muted">Use these options to reduce noise and keep scanning controlled in authorized environments.</p>
       <div class="row">
-        <label class="chip"><input type="checkbox" id="optTiming" /> Conservative timing (<code>-T2</code>)</label>
-        <label class="chip"><input type="checkbox" id="optRate" /> Limit rate (<code>--max-rate 100</code>)</label>
-        <label class="chip"><input type="checkbox" id="optRetries" /> Fewer retries (<code>--max-retries 2</code>)</label>
-        <label class="chip"><input type="checkbox" id="optTimeout" /> Host timeout (<code>--host-timeout 2m</code>)</label>
+        <button id="copyCmd" class="btn">Copy Command</button>
+        <button id="reset" class="btn ghost">Reset</button>
       </div>
-      <p class="tiny muted">Note: This toolkit intentionally avoids evasion features. Keep it blue-team, authorized, and logged.</p>
+
+      <div class="two-col mt">
+        <div>
+          <h3>Scan Details</h3>
+          <div id="scanDetails" class="panel muted">Select a scan to see details…</div>
+        </div>
+        <div>
+          <h3>MITRE / Controls (Training)</h3>
+          <div id="mapping" class="panel muted">Select a scan to see mapping…</div>
+        </div>
+      </div>
     </section>
+
+    <!-- Sample Results & SOC Notes -->
+    <section class="card">
+      <div class="row space">
+        <div>
+          <h2>Sample Results & SOC Notes</h2>
+          <p class="muted">These are realistic examples for blue-team learners. They are not live scans.</p>
+        </div>
+        <button id="copyOut" class="btn ghost">Copy Output</button>
+      </div>
+
+      <label class="label">Sample Output</label>
+      <div class="codebox">
+        <pre id="out" class="code">Select a scan to view a sample output…</pre>
+      </div>
+
+      <div class="three-col mt">
+        <div class="panel">
+          <h3>What it means</h3>
+          <div id="meaning" class="muted">—</div>
+        </div>
+        <div class="panel">
+          <h3>Risk</h3>
+          <div id="risk" class="muted">—</div>
+        </div>
+        <div class="panel">
+          <h3>Next steps (SOC triage)</h3>
+          <div id="next" class="muted">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History + Compare -->
+    <section class="card">
+      <div class="row space">
+        <div>
+          <h2>Saved History</h2>
+          <p class="muted">If “Save outputs” is enabled, each time you copy output it is saved locally in your browser.</p>
+        </div>
+        <button id="clearHistory" class="btn ghost">Clear</button>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <h3>Saved Entries</h3>
+          <div id="history" class="panel muted">No saved outputs yet.</div>
+        </div>
+        <div>
+          <h3>Compare (Last two)</h3>
+          <div class="panel">
+            <div class="muted">Shows what changed between the most recent two saves.</div>
+            <div class="codebox mt">
+              <pre id="diff" class="code">—</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
+      <a class="link" href="#" id="quickGuide">Quick Guide</a>
+    </footer>
   </main>
 
-  <footer class="container footer">
-    <p>© <span id="year"></span> Your Name • Built for authorized security testing and education • <a href="./README.html">Quick Guide</a></p>
-  </footer>
-
-  <!-- Legal modal -->
-  <dialog id="legalDialog" class="dialog">
-    <div class="dialog-head">
-      <h2>Legal Notice</h2>
-      <button id="btnCloseLegal" class="btn ghost" aria-label="Close">✕</button>
-    </div>
-    <div class="dialog-body">
-      <p><strong>Authorized use only.</strong> Use this toolkit only on systems you own or have explicit permission to test. Unauthorized scanning may be illegal and may violate policies.</p>
-      <ul>
-        <li>This site provides <em>command templates</em> and <em>sample outputs</em> for learning.</li>
-        <li>No live scanning is performed by this website.</li>
-        <li>Log and document activity in approved lab or test environments.</li>
-      </ul>
+  <!-- Legal Modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="row space">
+        <h2 id="modalTitle">Legal Notice</h2>
+        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+      </div>
+      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
+      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
+      <p>Log and document activity in approved lab or test environments.</p>
+      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
       <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
     </div>
-  </dialog>
+  </div>
 
-  <script src="./assets/app.js" type="module"></script>
+  <script src="app.js"></script>
 </body>
 </html>
