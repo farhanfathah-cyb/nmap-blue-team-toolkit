@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Farhan Fathah | Nmap Blue Team Toolkit</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="script.js"></script>
+</head>
+<body>
+<header>
+<h1>Farhan Fathah</h1>
+<p>Blue Team | SOC | Interactive Nmap Toolkit</p>
+<input type="text" id="search" placeholder="Search Nmap commands..." onkeyup="filterCommands()">
+</header>
+
+<main>
+<button onclick="toggleSection('basic')">Basic Scans</button>
+<div id="basic" class="section">
+<pre class="cmd">nmap 192.168.1.1</pre>
+<pre class="cmd">nmap 192.168.1.0/24</pre>
+</div>
+
+<button onclick="toggleSection('service')">Service & OS Detection</button>
+<div id="service" class="section">
+<pre class="cmd">nmap -sV target</pre>
+<pre class="cmd">nmap -O target</pre>
+</div>
+
+<button onclick="toggleSection('nse')">NSE Scripts</button>
+<div id="nse" class="section">
+<pre class="cmd">nmap --script vuln target</pre>
+<pre class="cmd">nmap --script smb-os-discovery target</pre>
+</div>
+
+<button onclick="toggleSection('evasion')">Firewall Evasion</button>
+<div id="evasion" class="section">
+<pre class="cmd">nmap -f target</pre>
+<pre class="cmd">nmap -D RND:10 target</pre>
+</div>
+
+<button onclick="showPopup()">Legal Notice</button>
+</main>
+
+<footer>
+<p>© Farhan Fathah | Cyber Security Portfolio</p>
+</footer>
+
+<div id="popup" class="popup">
+<div class="popup-content">
+<span onclick="closePopup()" class="close">&times;</span>
+<p>For authorized security testing and educational use only.</p>
+</div>
+</div>
+</body>
+</html>
