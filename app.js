@@ -599,7 +599,14 @@ function renderList(){
     </div>
   `).join("");
 
-  document.querySelectorAll(".scan").forEach(card => {
+  
+  // scan count + empty state
+  const countEl = el("scanCount");
+  if (countEl) countEl.textContent = `Scans loaded: ${items.length}`;
+  if (!items.length){
+    listEl.innerHTML = `<div class="empty">No scans match this filter. Try <b>All categories</b> or clear the search box.</div>`;
+  }
+document.querySelectorAll(".scan").forEach(card => {
     card.addEventListener("click", () => {
       const scan = SCANS.find(x => x.id === card.dataset.id);
       if (scan) renderSelected(scan);

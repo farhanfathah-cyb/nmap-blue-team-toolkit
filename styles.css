@@ -383,3 +383,19 @@ html[data-theme="light"] .check{background: rgba(255,255,255,.6)}
 html[data-theme="light"] .wizard-nav .btn.ghost{
   background: rgba(255,255,255,.6);
 }
+
+/* ---------- Scan library UX ---------- */
+#scanCount{
+  font-weight:800;
+}
+.empty{
+  padding:14px;
+  border:1px dashed var(--line);
+  border-radius:16px;
+  background: rgba(6,10,18,.35);
+  color: var(--muted);
+  margin-top:12px;
+}
+html[data-theme="light"] .empty{
+  background: rgba(255,255,255,.6);
+}
