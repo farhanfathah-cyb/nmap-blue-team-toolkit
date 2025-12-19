@@ -504,42 +504,38 @@ function renderList(){
   if(el("scanCount")) el("scanCount").textContent = "Scans loaded: " + items.length;
 }
 
-function maybeSaveCommand(){
-  const scan = state.selected || findScanById(getSelectedScanId());
-  if(!scan) return;
-  const entry = {
-    ts: Date.now(),
-    scanId: scan.id,
-    scanName: scan.name,
-    target: escapeForShell(getTarget()),
-    command: (el("cmd") ? el("cmd").textContent : buildCommand(scan))
-  };
-  const list = loadHistory();
-  list.push(entry);
-  saveHistory(list);
-}
+
 
 function renderHistory(){
-  const histEl=el("history"); const diffEl=el("diff");
-  if(!histEl || !diffEl) return;
-  const list=loadHistory();
-  if(!list.length){ histEl.textContent="No saved outputs yet."; diffEl.textContent="—"; return; }
+  const histEl = el("history");
+  if(!histEl) return;
+  const list = loadHistory();
+  if(!list.length){
+    histEl.innerHTML = "<p class='muted'>No commands saved yet.</p>";
+    return;
+  }
+  histEl.innerHTML = list.slice().reverse().map(item => `
+    <div class="card mt">
+      <b>${item.scanName}</b>
+      <div class="muted">${new Date(item.ts).toLocaleString()}</div>
+      <div class="muted">Target: ${item.target || "-"}</div>
+      <code>${item.command}</code>
+    </div>
+  `).join("");
+}
   histEl.innerHTML = list.slice().reverse().map(item=>`
     <div style="border-bottom:1px solid var(--border); padding:10px 0;">
       <div><b>${item.scanName}</b> <span class="muted">• ${new Date(item.ts).toLocaleString()}</span></div>
       <div class="muted" style="margin-top:6px;"><b>Target:</b> ${item.target||"(not set)"}</div>
       <div class="muted"><b>Command:</b> <code>${item.command}</code></div>
     </div>`).join("");
-  if(list.length<2){ diffEl.textContent="Save one more command to compare."; return; }
-  const a=(list[list.length-2].command||"").split(/\\s+/);
-  const b=(list[list.length-1].command||"").split(/\\s+/);
+  if(list.length<2){ diffEl.textContent="Save one more output to compare."; return; }
+  const a=list[list.length-2].output.split("\n"); const b=list[list.length-1].output.split("\n");
   const aSet=new Set(a), bSet=new Set(b);
-  const removed=a.filter(x=>x && !bSet.has(x)).slice(0,40);
-  const added=b.filter(x=>x && !aSet.has(x)).slice(0,40);
-  let out="";
-  removed.forEach(x=>out+=`- ${x}\\n`);
-  added.forEach(x=>out+=`+ ${x}\\n`);
-  diffEl.textContent=out.trim()||"(No obvious token changes detected)";
+  const removed=a.filter(l=>l.trim() && !bSet.has(l)).slice(0,25);
+  const added=b.filter(l=>l.trim() && !aSet.has(l)).slice(0,25);
+  let out=""; removed.forEach(l=>out+=`- ${l}\n`); added.forEach(l=>out+=`+ ${l}\n`);
+  diffEl.textContent=out.trim()||"(No obvious line changes detected)";
 }
 
 function bind(){
@@ -569,9 +565,11 @@ function bind(){
   if(el("category")) el("category").onchange=renderList;
   if(el("scanSelect")) el("scanSelect").onchange=()=>{ const id=el("scanSelect").value; if(!id) return; const scan=findScanById(id); if(scan) renderSelected(scan); };
 
-  if(el("copyCmd")) el("copyCmd").onclick=async()=>{ await copyText(el("cmd").textContent||""); maybeSaveCommand(); renderHistory(); };
-  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||""); };
+  if(el("copyCmd")) el("copyCmd").onclick=()=>copyText(el("cmd").textContent||"");
+  if(el("copyOut")) el("copyOut").onclick=async()=>{ await copyText(el("out").textContent||""); maybeSaveOutput(); renderHistory(); };
   if(el("clearHistory")) el("clearHistory").onclick=()=>{ localStorage.removeItem(HIST_KEY); renderHistory(); };
+  if(el("exportTxt")) el("exportTxt").onclick=exportHistoryTxt;
+  if(el("exportCsv")) el("exportCsv").onclick=exportHistoryCsv;
 
   const selectedId=getSelectedScanId();
   const scan=selectedId?findScanById(selectedId):null;
@@ -584,3 +582,55 @@ function bind(){
 
 initTheme();
 document.addEventListener("DOMContentLoaded", bind);
+
+
+function maybeSaveCommand(){
+  if(!state.selected) return;
+  const entry = {
+    ts: Date.now(),
+    scanId: state.selected.id,
+    scanName: state.selected.name,
+    target: getTarget(),
+    command: el("cmd") ? el("cmd").textContent : ""
+  };
+  const list = loadHistory();
+  list.push(entry);
+  saveHistory(list);
+}
+
+function downloadTextFile(filename, content){
+  const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+function downloadCsvFile(filename, rows){
+  const esc = (v) => {
+    const s = String(v ?? "");
+    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  };
+  const csv = rows.map(r => r.map(esc).join(",")).join("\n");
+  downloadTextFile(filename, csv);
+}
+function exportHistoryTxt(){
+  const list = loadHistory();
+  if(!list.length) return alert("No commands saved yet.");
+  const lines = list.map(x => {
+    const ts = new Date(x.ts).toISOString();
+    return `[${ts}] ${x.scanName} | target=${x.target||"-"}\n${x.command}\n`;
+  }).join("\n");
+  downloadTextFile("nmap_toolkit_history.txt", lines);
+}
+function exportHistoryCsv(){
+  const list = loadHistory();
+  if(!list.length) return alert("No commands saved yet.");
+  const rows = [["timestamp","scanName","target","command"]];
+  list.forEach(x => rows.push([new Date(x.ts).toISOString(), x.scanName, x.target||"", x.command]));
+  downloadCsvFile("nmap_toolkit_history.csv", rows);
+}

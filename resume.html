@@ -4,90 +4,73 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
-  <link rel="stylesheet" href="styles.css?v=v4" />
+  <link rel="stylesheet" href="styles.css?v=v7" />
 </head>
-<body>
+<body data-page="resume">
 <header class="hero">
   <div class="hero-overlay"></div>
-<header class="top">
+  <header class="top">
     <div class="brand">
       <div class="shield">🛡️</div>
       <div>
         <h1>Nmap Blue Team Toolkit</h1>
         <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-        <p class="sub">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only) • Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
       </div>
     </div>
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
       <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
-      
-      <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <span class="badge" title="Mode">🏠 Home Lab Mode</span>
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
       <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
-
     <nav class="nav" aria-label="Site navigation">
       <a href="index.html" data-nav="index">Dashboard</a>
       <a href="target.html" data-nav="target">Target</a>
       <a href="scans.html" data-nav="scans">Scan Library</a>
       <a href="builder.html" data-nav="builder">Command Builder</a>
-      <a href="results.html" data-nav="results">Results & SOC</a>
+      <a href="results.html" data-nav="results">Results &amp; SOC</a>
       <a href="history.html" data-nav="history">History</a>
       <a href="resume.html" data-nav="resume">Resume</a>
-          <a href="learning.html" data-nav="learning">Learning</a>
+      <a href="learning.html" data-nav="learning">Learning</a>
     </nav>
-
+  </header>
 </header>
 <main class="wrap">
-<section class="card" id="resumeSection">
-      <div class="row space">
-        <div>
-          <h2>Resume</h2>
-          <p class="muted">Download my resume (PDF).</p>
-        </div>
-        <a class="btn" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer" download>⬇️ Download Resume</a>
-      </div>
 
-      <div class="panel">
-        <div class="muted"><b>Farhan Mohammed Fathah — Cybersecurity Enthusiast</b></div>
-        <div class="muted" style="margin-top:8px">Tip: You can also add this link to your LinkedIn Featured section.</div>
-      </div>
-    </section>
-
-<div class="wizard-nav">
-  <a class="btn ghost" href="history.html">← Back: History</a>
-  <a class="btn" href="learning.html">Next: Learning →</a>
-</div>
-
-<footer class="foot">
-      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
-      <a class="link" href="#" id="quickGuide">Quick Guide</a>
-    </footer>
-</main>
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-card">
-      <div class="row space">
-        <h2 id="modalTitle">Legal Notice</h2>
-        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
-      </div>
-      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
-      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
-      <p>Log and document activity in approved lab or test environments.</p>
-      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-      <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+<section class="card">
+  <div class="row space">
+    <div>
+      <h2>Resume</h2>
+      <p class="muted">Preview and download.</p>
+    </div>
+    <div class="row">
+      <a class="btn primary" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Download PDF</a>
     </div>
   </div>
+  <div class="card" style="margin-top:12px; padding:0; overflow:hidden">
+    <iframe title="Resume PDF" src="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" style="width:100%; height:78vh; border:0"></iframe>
+  </div>
+  <p class="muted small mt">If the preview does not load in your browser, use the Download button.</p>
+</section>
 
-  <script>
-    (function(){
-      const key = "resume";
-      document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.nav === key) a.classList.add('active');
-      });
-    })();
-  </script>
-
-<script src="app.js?v=v4"></script>
+<footer class="foot">
+  © Farhan Mohammed Fathah • Built for authorized security testing and education •
+  <a class="link" href="#" id="quickGuide">Quick Guide</a>
+</footer>
+</main>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="row space">
+      <h2 id="modalTitle">Legal Notice</h2>
+      <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+    </div>
+    <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
+    <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
+    <p>Log and document activity in approved lab or test environments.</p>
+    <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah</p>
+  </div>
+</div>
+<script src="app.js?v=v7"></script>
 </body>
 </html>
