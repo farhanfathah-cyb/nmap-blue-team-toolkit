@@ -1,110 +1,81 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dashboard • Nmap Blue Team Toolkit</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+  <meta name="description" content="Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only)"/>
 </head>
 <body>
-<header class="hero">
-  <div class="hero-overlay"></div>
-<header class="top">
-    <div class="brand">
-      <div class="shield">🛡️</div>
-      <div>
-        <h1>Nmap Blue Team Toolkit</h1>
-        <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-        <p class="sub">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only) • Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-      </div>
-    </div>
-    <div class="header-actions">
-      <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
-      <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <div class="badge">🛡️</div>
+        <div class="brand-title">
+          <b>Nmap Blue Team Toolkit</b>
+          <span>Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
+        </div>
+      </a>
       
-      <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
-      <button id="openLegal" class="btn ghost">Legal Notice</button>
-    </div>
-
-    <nav class="nav" aria-label="Site navigation">
-      <a href="index.html" data-nav="index">Dashboard</a>
-      <a href="target.html" data-nav="target">Target</a>
-      <a href="scans.html" data-nav="scans">Scan Library</a>
-      <a href="builder.html" data-nav="builder">Command Builder</a>
-      <a href="results.html" data-nav="results">Results & SOC</a>
-      <a href="history.html" data-nav="history">History</a>
-      <a href="resume.html" data-nav="resume">Resume</a>
-    </nav>
-
-</header>
-<main class="wrap">
-
-<section class="card">
-  <h2>Dashboard</h2>
-  <p class="muted">Welcome! Use the pages below to configure your target, choose scans, and generate blue-team focused Nmap commands.</p>
-  <div class="dash-grid">
-    <div class="dash-card"><div class="dash-k">1) Set Target</div><div class="dash-v"><a class="link" href="target.html">Open Target Page →</a></div></div>
-    <div class="dash-card"><div class="dash-k">2) Choose Scan</div><div class="dash-v"><a class="link" href="scans.html">Open Scan Library →</a></div></div>
-    <div class="dash-card"><div class="dash-k">3) Build Command</div><div class="dash-v"><a class="link" href="builder.html">Open Builder →</a></div></div>
-  </div>
-  <p class="note mt">Tip: Your target and settings are saved locally in your browser so you don’t need to re-enter them.</p>
-</section>
-
-<section class="card" id="socDashboard">
-  <div class="row space">
-    <div>
-      <h2>SOC Dashboard</h2>
-      <p class="muted">Quick snapshot based on the selected scan and sample results.</p>
-    </div>
-    <div class="pill" id="dashCount">Scans available: —</div>
-  </div>
-
-  <div class="dash-grid">
-    <div class="dash-card">
-      <div class="dash-k">Selected scan</div>
-      <div class="dash-v" id="dashScan">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Risk</div>
-      <div class="dash-v" id="dashRisk">—</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-k">Open ports (from sample)</div>
-      <div class="dash-v" id="dashPorts">—</div>
-    </div>
-  </div>
-</section>
-
-
-<footer class="foot">
-      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
-      <a class="link" href="#" id="quickGuide">Quick Guide</a>
-    </footer>
-</main>
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-card">
-      <div class="row space">
-        <h2 id="modalTitle">Legal Notice</h2>
-        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
+      <nav class="nav">
+        <a href="index.html">Dashboard</a>
+        <a href="target.html">Target</a>
+        <a href="scans.html">Scan Library</a>
+        <a href="builder.html">Command Builder</a>
+        <a href="results.html">Results & SOC</a>
+        <a href="history.html">History</a>
+      </nav>
+    
+      <div class="actions">
+        <a class="btn" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
+        <button id="themeBtn" class="btn" title="Toggle theme">🌙</button>
+        <button id="legalBtn" class="btn">Legal Notice</button>
       </div>
-      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
-      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
-      <p>Log and document activity in approved lab or test environments.</p>
-      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-      <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+    </div>
+  </div>
+  <div class="container">
+
+<section class="card hero">
+  <h1>Blue Team Nmap Toolkit</h1>
+  <div class="sub">Pick a scan → generate a copy‑paste command → view realistic sample output + SOC notes.</div>
+  <div class="grid grid-2">
+    <div class="card block">
+      <h2>Quick Start</h2>
+      <p class="small">1) Set a target • 2) Choose a scan • 3) Copy command • 4) Review SOC notes</p>
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+        <a class="btn btn-good" href="target.html">Start → Set Target</a>
+        <a class="btn btn-primary" href="scans.html">Next → Scan Library</a>
+      </div>
+      <div style="margin-top:14px" class="notice"><b>Authorized Use Only.</b> Use for labs or approved testing only.</div>
+    </div>
+    <div class="card block">
+      <h2>Updates</h2>
+      <ul class="small" style="margin:10px 0 0 18px">
+        <li><b>Scan List dropdown</b> + scan tagging (category, noise, risk).</li>
+        <li>Preview output from Scan Library.</li>
+        <li>Builder shows full command ready to copy.</li>
+      </ul>
+      <div class="small" style="margin-top:12px">Branding: <b>Farhan Mohammed Fathah — Cybersecurity Enthusiast</b></div>
+    </div>
+  </div>
+</section>
+
+  </div>
+
+  <div id="legalModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Legal Notice">
+    <div class="card modal">
+      <h3>Legal Notice</h3>
+      <p class="small">Authorized use only. Use this toolkit only on systems you own or have explicit permission to test.</p>
+      <p class="small">This site provides command templates and sample outputs for learning. No live scanning is performed by this website.</p>
+      <p class="small">Log and document activity in approved lab or test environments.</p>
+      <div class="notice" style="margin-top:10px"><b>Tip:</b> Add your organization’s acceptable-use policy link here.</div>
+      <div class="modal-actions"><button id="legalClose" class="btn">Close</button></div>
     </div>
   </div>
 
-  <script>
-    (function(){
-      const key = "index";
-      document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.nav === key) a.classList.add('active');
-      });
-    })();
-  </script>
+  <footer class="container">© Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education • <span class="kbd">v1.1</span></footer>
 
-<script src="app.js"></script>
+  <script src="assets/app.js"></script>
 </body>
 </html>

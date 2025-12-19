@@ -1,99 +1,89 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah — Cybersecurity Enthusiast</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Target • Nmap Blue Team Toolkit</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+  <meta name="description" content="Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only)"/>
 </head>
 <body>
-<header class="hero">
-  <div class="hero-overlay"></div>
-<header class="top">
-    <div class="brand">
-      <div class="shield">🛡️</div>
-      <div>
-        <h1>Nmap Blue Team Toolkit</h1>
-        <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-        <p class="sub">Blue Team | SOC | Interactive Nmap Command Builder (Authorized Use Only) • Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <div class="badge">🛡️</div>
+        <div class="brand-title">
+          <b>Nmap Blue Team Toolkit</b>
+          <span>Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
+        </div>
+      </a>
+      
+      <nav class="nav">
+        <a href="index.html">Dashboard</a>
+        <a href="target.html">Target</a>
+        <a href="scans.html">Scan Library</a>
+        <a href="builder.html">Command Builder</a>
+        <a href="results.html">Results & SOC</a>
+        <a href="history.html">History</a>
+      </nav>
+    
+      <div class="actions">
+        <a class="btn" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
+        <button id="themeBtn" class="btn" title="Toggle theme">🌙</button>
+        <button id="legalBtn" class="btn">Legal Notice</button>
       </div>
     </div>
-    <div class="header-actions">
-      <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
-      <a class="link" href="assets/Farhan_Mohammed_Fathah_IT_Security_Analyst.pdf" target="_blank" rel="noreferrer">Resume</a>
-      
-      <span id="brandBadge" class="badge" title="Brand">Farhan Mohammed Fathah — Cybersecurity Enthusiast</span>
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
-      <button id="openLegal" class="btn ghost">Legal Notice</button>
-    </div>
-
-    <nav class="nav" aria-label="Site navigation">
-      <a href="index.html" data-nav="index">Dashboard</a>
-      <a href="target.html" data-nav="target">Target</a>
-      <a href="scans.html" data-nav="scans">Scan Library</a>
-      <a href="builder.html" data-nav="builder">Command Builder</a>
-      <a href="results.html" data-nav="results">Results & SOC</a>
-      <a href="history.html" data-nav="history">History</a>
-      <a href="resume.html" data-nav="resume">Resume</a>
-    </nav>
-
-</header>
-<main class="wrap">
+  </div>
+  <div class="container">
 
 <section class="card">
-  <h2>Target</h2>
-  <p class="muted">Enter an IP, hostname, or CIDR block. This is stored locally in your browser for use across pages.</p>
-  <div class="row">
-    <input id="target" class="input" type="text" placeholder="e.g., 192.168.1.10 or scanme.nmap.org or 10.0.0.0/24" />
-    <button id="exampleTarget" class="btn" title="Paste a safe example target">Example</button>
+  <div class="toolbar">
+    <div style="flex:1">
+      <h2 style="margin:0">Target</h2>
+      <div class="small">Enter an IP / hostname / subnet. Saved locally in your browser.</div>
+    </div>
+    <a class="btn btn-primary" href="scans.html">Next → Scan Library</a>
   </div>
-
-  <div class="grid">
-    <label class="check"><input type="checkbox" id="useSudo"> Prefix with <code>sudo</code></label>
-    <label class="check"><input type="checkbox" id="saveOutputs"> Save outputs</label>
-    <label class="check"><input type="checkbox" id="noDNS"> No DNS (<code>-n</code>)</label>
-    <label class="check"><input type="checkbox" id="treatUp"> Treat as up (<code>-Pn</code>)</label>
+  <div class="block">
+    <label class="small">Target (IP / Hostname / CIDR)</label>
+    <input id="savedTarget" type="text" placeholder="e.g., 10.0.0.0/24 or example.local" style="width:100%; max-width:720px"/>
+    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+      <button id="saveTargetBtn" class="btn btn-good">Save Target</button>
+      <button id="clearTargetBtn" class="btn">Clear</button>
+    </div>
+    <div class="notice" style="margin-top:12px"><b>Tip:</b> You can override the target later in Builder.</div>
   </div>
-
-  <h3 class="mt">Safety Controls (Defensive)</h3>
-  <div class="grid">
-    <label class="check"><input type="checkbox" id="t2"> Conservative timing (<code>-T2</code>)</label>
-    <label class="check"><input type="checkbox" id="maxRate"> Limit rate (<code>--max-rate 100</code>)</label>
-    <label class="check"><input type="checkbox" id="maxRetries"> Fewer retries (<code>--max-retries 2</code>)</label>
-    <label class="check"><input type="checkbox" id="hostTimeout"> Host timeout (<code>--host-timeout 2m</code>)</label>
-  </div>
-
-  <p class="note">Tip: Set your target and safety controls here once. Other pages will use the same saved settings.</p>
 </section>
 
-<footer class="foot">
-      © Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education •
-      <a class="link" href="#" id="quickGuide">Quick Guide</a>
-    </footer>
-</main>
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-card">
-      <div class="row space">
-        <h2 id="modalTitle">Legal Notice</h2>
-        <button id="closeLegal" class="btn ghost" aria-label="Close">✕</button>
-      </div>
-      <p><b>Authorized use only.</b> Use this toolkit only on systems you own or have explicit permission to test.</p>
-      <p>This site provides <b>command templates</b> and <b>sample outputs</b> for learning. <b>No live scanning</b> is performed by this website.</p>
-      <p>Log and document activity in approved lab or test environments.</p>
-      <p class="muted"><b>Made by:</b> Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-      <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const el = document.querySelector('#savedTarget');
+  el.value = localStorage.getItem('defaultTarget') || '';
+  document.querySelector('#saveTargetBtn').addEventListener('click', ()=>{
+    localStorage.setItem('defaultTarget', el.value.trim());
+    toast('Target saved ✅');
+  });
+  document.querySelector('#clearTargetBtn').addEventListener('click', ()=>{
+    localStorage.removeItem('defaultTarget'); el.value=''; toast('Target cleared');
+  });
+});
+</script>
+
+  </div>
+
+  <div id="legalModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Legal Notice">
+    <div class="card modal">
+      <h3>Legal Notice</h3>
+      <p class="small">Authorized use only. Use this toolkit only on systems you own or have explicit permission to test.</p>
+      <p class="small">This site provides command templates and sample outputs for learning. No live scanning is performed by this website.</p>
+      <p class="small">Log and document activity in approved lab or test environments.</p>
+      <div class="notice" style="margin-top:10px"><b>Tip:</b> Add your organization’s acceptable-use policy link here.</div>
+      <div class="modal-actions"><button id="legalClose" class="btn">Close</button></div>
     </div>
   </div>
 
-  <script>
-    (function(){
-      const key = "target";
-      document.querySelectorAll('.nav a').forEach(a => {
-        if (a.dataset.nav === key) a.classList.add('active');
-      });
-    })();
-  </script>
+  <footer class="container">© Farhan Mohammed Fathah — Cybersecurity Enthusiast • Built for authorized security testing and education • <span class="kbd">v1.1</span></footer>
 
-<script src="app.js"></script>
+  <script src="assets/app.js"></script>
 </body>
 </html>

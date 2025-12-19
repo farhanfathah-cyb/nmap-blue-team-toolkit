@@ -1,159 +1,110 @@
 [
   {
-    "id": "host_discovery",
-    "category": "Discovery",
-    "title": "Host Discovery (Ping Sweep)",
-    "description": "Find live hosts on a subnet without port scanning (ICMP/ARP).",
-    "command": "nmap -sn {{target}}",
-    "sample_output": "Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-19 22:00 +04\nNmap scan report for 192.168.1.1\nHost is up (0.0042s latency).\nMAC Address: 3C:52:82:AA:BB:CC (VendorName)\nNmap scan report for 192.168.1.10\nHost is up (0.0019s latency).\nMAC Address: 88:1F:A1:11:22:33 (VendorName)\nNmap scan report for 192.168.1.25\nHost is up (0.0031s latency).\nNmap done: 256 IP addresses (3 hosts up) scanned in 3.58 seconds",
-    "meaning": [
-      "At least 3 hosts responded as live; this is your starting asset inventory.",
-      "MAC addresses appear on local networks; use them to identify device vendors.",
-      "Low latency suggests the hosts are nearby (same LAN/VLAN)."
+    "id": "disc_ping_sweep",
+    "name": "Ping Sweep (Live Hosts)",
+    "category": "discovery",
+    "tags": [
+      "ICMP",
+      "host-discovery"
     ],
-    "next_steps": [
-      "Confirm asset ownership (CMDB / inventory).",
-      "Run a targeted port scan only on approved live hosts.",
-      "If a host should not be present, open an investigation ticket."
+    "noise": "low",
+    "risk": "safe",
+    "description": "Find live hosts quickly in a subnet (no port scan).",
+    "command": "nmap -sn {TARGET}",
+    "sample_output": "Nmap scan report for 10.0.0.12\nHost is up (0.0031s latency).\nNmap scan report for 10.0.0.20\nHost is up (0.0019s latency).\nNmap done: 256 IP addresses (2 hosts up) scanned in 2.34 seconds",
+    "soc_notes": [
+      "Look for unusual sweep activity (many ICMP echo requests).",
+      "Correlate with firewall/IDS logs for scan source, time window, and subnet scope."
     ]
   },
   {
-    "id": "top_ports_tcp",
-    "category": "Discovery",
-    "title": "Top 100 TCP Ports",
-    "description": "Quickly check the most common TCP ports for exposure.",
-    "command": "nmap --top-ports 100 {{target}}",
-    "sample_output": "Nmap scan report for 192.168.1.10\nHost is up (0.0020s latency).\nNot shown: 97 closed tcp ports (reset)\nPORT    STATE SERVICE\n22/tcp  open  ssh\n80/tcp  open  http\n445/tcp open  microsoft-ds\n\nNmap done: 1 IP address (1 host up) scanned in 1.21 seconds",
-    "meaning": [
-      "SSH (22) and HTTP (80) are common; validate they are expected for this host role.",
-      "SMB (445) is sensitive \u2014 investigate whether it should be reachable from this network segment.",
-      "Closed ports are normal; focus on unexpected open services."
+    "id": "base_top_ports",
+    "name": "Top Ports Scan (Fast Baseline)",
+    "category": "baseline",
+    "tags": [
+      "inventory",
+      "fast"
     ],
-    "next_steps": [
-      "Check firewall policy: is 445 allowed where it shouldn\u2019t be?",
-      "If 445 is exposed, review Windows logs and SMB hardening baseline.",
-      "Run version detection (-sV) on open ports to confirm software versions."
+    "noise": "medium",
+    "risk": "monitor",
+    "description": "Quick baseline of common ports and services.",
+    "command": "nmap --top-ports 1000 -sV {TARGET}",
+    "sample_output": "PORT     STATE SERVICE  VERSION\n22/tcp   open  ssh      OpenSSH 8.2p1\n80/tcp   open  http     nginx 1.18.0\n443/tcp  open  ssl/http nginx 1.18.0\nService detection performed. Please report any incorrect results.",
+    "soc_notes": [
+      "Use results to validate asset inventory and expected services.",
+      "Alert if new services appear unexpectedly."
     ]
   },
   {
-    "id": "service_default_scripts",
-    "category": "Enumeration",
-    "title": "Default Scripts + Version Detection",
-    "description": "Gather service versions and run safe default scripts for context.",
-    "command": "nmap -sC -sV {{target}}",
-    "sample_output": "Nmap scan report for web01.lab.local (10.0.2.15)\nHost is up (0.012s latency).\nPORT    STATE SERVICE  VERSION\n22/tcp  open  ssh      OpenSSH 8.2p1 Ubuntu 4ubuntu0.11 (Ubuntu Linux; protocol 2.0)\n80/tcp  open  http     nginx 1.18.0 (Ubuntu)\n443/tcp open  ssl/http nginx 1.18.0 (Ubuntu)\n\n| http-title: Welcome to nginx!\n|_Requested resource was /\n| ssl-cert: Subject: commonName=web01.lab.local\n| Not valid before: 2025-01-10T00:00:00\n|_Not valid after:  2026-01-10T23:59:59\n\nService Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel\n\nNmap done: 1 IP address (1 host up) scanned in 12.40 seconds",
-    "meaning": [
-      "You have a web server (nginx) with SSH enabled; confirm if SSH is required and restricted.",
-      "The certificate dates help validate rotation schedules and inventory.",
-      "CPE hints can support vulnerability matching, but confirm accuracy."
+    "id": "expo_full_tcp",
+    "name": "Full TCP Port Scan (Exposure Check)",
+    "category": "exposure",
+    "tags": [
+      "all-ports",
+      "exposure"
     ],
-    "next_steps": [
-      "Compare versions against your patch baseline and approved software list.",
-      "Check exposure: are 80/443 intended externally or only internally?",
-      "Collect logs: web access logs, auth logs, EDR telemetry for that host."
+    "noise": "high",
+    "risk": "alerting",
+    "description": "Thorough check of all TCP ports (slower, noisier).",
+    "command": "nmap -p- -sS -T4 {TARGET}",
+    "sample_output": "Not shown fully (65,535 ports checked)\nPORT      STATE SERVICE\n135/tcp   open  msrpc\n445/tcp   open  microsoft-ds\n3389/tcp  open  ms-wbt-server",
+    "soc_notes": [
+      "High-volume SYNs across many ports are usually detectable.",
+      "Coordinate a change window for production."
     ]
   },
   {
-    "id": "os_detection",
-    "category": "Enumeration",
-    "title": "OS Detection (Fingerprint)",
-    "description": "Attempt to identify the operating system (best effort).",
-    "command": "nmap -O {{target}}",
-    "sample_output": "Nmap scan report for 10.0.2.15\nHost is up (0.013s latency).\nPORT    STATE SERVICE\n22/tcp  open  ssh\n80/tcp  open  http\n\nOS details: Linux 4.15 - 5.6 (general purpose)\nNetwork Distance: 2 hops\nOS detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 16.72 seconds",
-    "meaning": [
-      "OS guesses are probabilistic; treat them as hints, not proof.",
-      "Network distance suggests routing between you and the host."
+    "id": "web_tls_audit",
+    "name": "TLS / SSL Checks (HTTPS Posture)",
+    "category": "web",
+    "tags": [
+      "ssl",
+      "http"
     ],
-    "next_steps": [
-      "Validate OS via endpoint management/EDR or authenticated inventory tools.",
-      "If OS seems out of policy, confirm host owner and patch status.",
-      "Use -sV/-sC to gather more reliable service details."
+    "noise": "low",
+    "risk": "safe",
+    "description": "Identify TLS ciphers and certificate details.",
+    "command": "nmap -p 443 --script ssl-enum-ciphers,ssl-cert {TARGET}",
+    "sample_output": "| ssl-cert: Subject: commonName=example.local\n| Issuer: commonName=Example CA\n| Not valid before: 2025-01-01\n|_Not valid after:  2026-01-01\n| ssl-enum-ciphers:\n|   TLSv1.2:\n|     ciphers:\n|       TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (secp256r1) - A\n|_  least strength: A",
+    "soc_notes": [
+      "Track weak protocols/ciphers (TLS 1.0/1.1) for remediation.",
+      "Certificate anomalies can indicate misconfiguration or MITM."
     ]
   },
   {
-    "id": "udp_top_ports",
-    "category": "UDP",
-    "title": "UDP Top 50 Ports",
-    "description": "Check common UDP services (DNS/NTP/SNMP etc.).",
-    "command": "nmap -sU --top-ports 50 {{target}}",
-    "sample_output": "Nmap scan report for 10.0.2.20\nHost is up (0.011s latency).\nPORT    STATE         SERVICE\n53/udp  open          domain\n123/udp open          ntp\n161/udp open|filtered snmp\n\nNmap done: 1 IP address (1 host up) scanned in 25.03 seconds",
-    "meaning": [
-      "UDP scans can show open|filtered due to lack of responses; interpret carefully.",
-      "DNS/NTP may be expected on infra servers; confirm role alignment.",
-      "SNMP should be restricted; open|filtered still warrants review."
+    "id": "win_smb_enum",
+    "name": "SMB Exposure & Enum (Windows)",
+    "category": "windows",
+    "tags": [
+      "smb",
+      "enum"
     ],
-    "next_steps": [
-      "Confirm the host role (DNS/NTP/SNMP server?) and approved exposure.",
-      "Review SNMP configuration (v3 preferred) and ACLs.",
-      "Monitor for amplification risk if UDP services are internet-exposed."
+    "noise": "medium",
+    "risk": "monitor",
+    "description": "Detect SMB and gather safe metadata using scripts.",
+    "command": "nmap -p 445 --script smb-os-discovery,smb2-security-mode,smb2-time {TARGET}",
+    "sample_output": "| smb-os-discovery:\n|   OS: Windows Server 2019\n|   Computer name: FILESRV01\n|_  System time: 2025-12-19T19:01:22+00:00\n| smb2-security-mode:\n|   2.02:\n|_    Message signing enabled and required",
+    "soc_notes": [
+      "External SMB exposure is high risk; verify segmentation.",
+      "Watch for repeated script probes across many hosts."
     ]
   },
   {
-    "id": "http_headers_methods",
-    "category": "Web",
-    "title": "HTTP Headers + Methods",
-    "description": "Inspect basic HTTP security headers and allowed methods.",
-    "command": "nmap --script http-headers,http-methods -p 80,443 {{target}}",
-    "sample_output": "Nmap scan report for 10.0.2.15\nHost is up (0.012s latency).\n\nPORT    STATE SERVICE\n80/tcp  open  http\n| http-headers:\n|   Server: nginx/1.18.0\n|   X-Frame-Options: SAMEORIGIN\n|   X-Content-Type-Options: nosniff\n|_  Content-Security-Policy: default-src 'self'\n| http-methods:\n|_  Supported Methods: GET HEAD POST\n\n443/tcp open  https\n| http-headers:\n|   Strict-Transport-Security: max-age=31536000\n|_  Server: nginx/1.18.0\n\nNmap done: 1 IP address (1 host up) scanned in 6.81 seconds",
-    "meaning": [
-      "Security headers are present; this reduces common browser-based risks.",
-      "Allowed methods are limited to GET/HEAD/POST \u2014 good baseline control."
+    "id": "dns_zone_xfer",
+    "name": "DNS Zone Transfer Test",
+    "category": "dns",
+    "tags": [
+      "dns",
+      "misconfig"
     ],
-    "next_steps": [
-      "Verify headers match your web security standards (HSTS, CSP, etc.).",
-      "If risky methods appear (PUT/DELETE), review app configuration.",
-      "Correlate with WAF/CDN settings if applicable."
-    ]
-  },
-  {
-    "id": "tls_ciphers",
-    "category": "Web",
-    "title": "TLS Certificate + Cipher Overview",
-    "description": "Review cert details and supported cipher suites (high-level).",
-    "command": "nmap --script ssl-cert,ssl-enum-ciphers -p 443 {{target}}",
-    "sample_output": "Nmap scan report for 10.0.2.15\nHost is up (0.012s latency).\n\nPORT    STATE SERVICE\n443/tcp open  https\n| ssl-cert: Subject: commonName=web01.lab.local\n| Issuer: commonName=Lab CA\n| Not valid before: 2025-01-10T00:00:00\n|_Not valid after:  2026-01-10T23:59:59\n| ssl-enum-ciphers:\n|   TLSv1.2:\n|     ciphers:\n|       TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (secp256r1) - A\n|       TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (secp256r1) - A\n|   TLSv1.0:\n|     ciphers:\n|_      TLS_RSA_WITH_AES_128_CBC_SHA - C\n\nNmap done: 1 IP address (1 host up) scanned in 14.02 seconds",
-    "meaning": [
-      "TLS 1.2 strong suites are supported; TLS 1.0 presence is a downgrade risk.",
-      "Certificate validity dates help ensure timely renewal."
-    ],
-    "next_steps": [
-      "Disable legacy TLS versions (TLS 1.0/1.1) per policy.",
-      "Confirm certificate chain and renewal automation.",
-      "Track remediation in a vulnerability/hardening ticket."
-    ]
-  },
-  {
-    "id": "smb_os_discovery",
-    "category": "Windows/SMB",
-    "title": "SMB OS Discovery",
-    "description": "Identify Windows host details via SMB (when allowed).",
-    "command": "nmap --script smb-os-discovery -p 445 {{target}}",
-    "sample_output": "Nmap scan report for 10.0.2.30\nHost is up (0.0090s latency).\n\nPORT    STATE SERVICE\n445/tcp open  microsoft-ds\n| smb-os-discovery:\n|   OS: Windows Server 2019 Standard 17763 (Windows Server 2019 Standard 6.3)\n|   Computer name: FILE01\n|   NetBIOS computer name: FILE01\\x00\n|   Domain name: LAB\n|   FQDN: FILE01.lab.local\n|_  System time: 2025-12-19T18:00:21+00:00\n\nNmap done: 1 IP address (1 host up) scanned in 7.43 seconds",
-    "meaning": [
-      "Host appears to be a Windows Server file server in domain LAB.",
-      "Time skew can hint at NTP issues; verify if time differs significantly."
-    ],
-    "next_steps": [
-      "Confirm 445 exposure aligns with segmentation policy.",
-      "Review SMB signing, NTLM policy, and admin share access controls.",
-      "Monitor authentication logs for abnormal patterns."
-    ]
-  },
-  {
-    "id": "reporting_outputs",
-    "category": "Reporting",
-    "title": "Save Output for Tickets (Normal + XML)",
-    "description": "Create output files you can attach to incidents and change tracking.",
-    "command": "nmap -sC -sV -oN scan.txt -oX scan.xml {{target}}",
-    "sample_output": "# scan.txt (excerpt)\nNmap scan report for 10.0.2.15\nPORT    STATE SERVICE  VERSION\n22/tcp  open  ssh      OpenSSH 8.2p1\n80/tcp  open  http     nginx 1.18.0\n\n# scan.xml (excerpt)\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nmaprun scanner=\"nmap\" args=\"nmap -sC -sV -oN scan.txt -oX scan.xml 10.0.2.15\">...</nmaprun>",
-    "meaning": [
-      "Text output is easy to read; XML output supports tooling and diffs.",
-      "Saving outputs improves auditability and incident documentation."
-    ],
-    "next_steps": [
-      "Attach scan.txt to the ticket and store scan.xml for comparisons.",
-      "Schedule re-scans for change control windows.",
-      "Use SIEM/EDR to correlate detected services with observed traffic."
+    "noise": "low",
+    "risk": "monitor",
+    "description": "Check if a DNS server allows AXFR (misconfiguration).",
+    "command": "nmap -p 53 --script dns-zone-transfer --script-args dns-zone-transfer.domain={DOMAIN} {TARGET}",
+    "sample_output": "| dns-zone-transfer:\n|   domain: example.com\n|   AXFR: failed (REFUSED)\n|_  Refusal is expected / secure behavior",
+    "soc_notes": [
+      "If AXFR succeeds, treat as sensitive exposure.",
+      "Restrict transfers to authorized secondaries only."
     ]
   }
 ]
