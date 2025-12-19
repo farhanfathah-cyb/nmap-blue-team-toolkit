@@ -340,8 +340,8 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
     name: "NULL Scan (Learning)",
     category: "incident",
     tags: ["learning","stealth","tcp"],
-    locked: true,
-    cmd: [],
+    locked: false,
+    cmd: ["-sN"],
     details: "Explains how NULL-flag probes behave and what defenders should look for in logs/IDS.",
     mapping: "MITRE: T1595 (Active Scanning) • Detection: IDS/Firewall logs, abnormal TCP flags",
     sample: `Training note:\n- Some probes send TCP packets with no flags set.\n- Responses vary by OS and firewall behavior.\n\nDefender focus:\n- Alert on unusual TCP flag combinations\n- Correlate with connection attempts and scan patterns`,
@@ -354,8 +354,8 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
     name: "XMAS Scan (Learning)",
     category: "incident",
     tags: ["learning","stealth","tcp"],
-    locked: true,
-    cmd: [],
+    locked: false,
+    cmd: ["-sX"],
     details: "Explains 'XMAS tree' style probes and defensive detections.",
     mapping: "MITRE: T1595 (Active Scanning) • Detection: IDS TCP flag anomalies",
     sample: `Training note:\n- Some probes set multiple flags at once (e.g., FIN/PSH/URG).\n\nDefender focus:\n- Flag anomalies in IDS\n- Look for sweeps across many ports\n- Confirm if source is authorized scanner`,
@@ -368,8 +368,7 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
     name: "ACK Scan (Learning)",
     category: "incident",
     tags: ["learning","firewall","mapping"],
-    locked: true,
-    cmd: [],
+    cmd: ["-sA"],
     details: "Explains how ACK-based probing can be used to map firewall rules (stateful vs stateless behavior).",
     mapping: "MITRE: T1595 (Active Scanning) • Detection: firewall 'ACK without SYN' patterns",
     sample: `Training note:\n- ACK probes can help infer filtering behavior.\n\nDefender focus:\n- Alert on packets that don't match established state\n- Watch for repeated probes across ports`,
@@ -377,20 +376,6 @@ Nmap done: 256 IP addresses (2 hosts up) scanned in 1.10 seconds`,
     risk: "🔴 High misuse potential — learning content only.",
     next: "Defenders: enforce stateful inspection, drop invalid packets, and monitor for scan patterns."
   },
-  {
-    id: "learning_firewall_evasion",
-    name: "Firewall Evasion Concepts (Learning)",
-    category: "incident",
-    tags: ["learning","evasion","defense"],
-    locked: true,
-    cmd: [],
-    details: "High-level overview of common evasion ideas and how to defend (no step-by-step or runnable commands).",
-    mapping: "MITRE: T1595 (Active Scanning) • Defense: segmentation, rate-limits, IDS tuning",
-    sample: `Defensive checklist:\n- Enable and review firewall/IDS logs\n- Use rate limits and connection thresholds\n- Segment networks and restrict admin ports\n- Confirm scanning windows and scanner IP allowlists`,
-    meaning: "Focuses on how blue teams detect and reduce evasion effectiveness.",
-    risk: "🟠 Medium (conceptual).",
-    next: "Define authorized scanning policy; add allowlists for sanctioned scanners; alert on out-of-policy scans."
-  }
 ];
 
 
@@ -422,9 +407,9 @@ function getSettingsFlags(){ const f=[]; if(getSetting("noDNS")) f.push("-n"); i
 function findScanById(id){ return SCANS.find(s=>s.id===id)||null; }
 
 function buildCommand(scan){
-  if (scan && scan.locked) {
-    return "⚠️ This scan type is shown for defensive learning only. The toolkit does not generate a runnable command for it.";
-  }
+ // if (scan && scan.locked) {
+    //return "⚠️ This scan type is shown for defensive learning only. The toolkit does not generate a runnable command for it.";
+  //}
 
   const targetRaw = getTarget();
   const target = escapeForShell(targetRaw);
