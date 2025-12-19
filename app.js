@@ -576,8 +576,12 @@ function renderSelected(scan){
 }
 
 function renderList(){
-  const q = el("search").value.trim().toLowerCase();
-  const cat = el("category").value;
+  const searchEl = el("search");
+  const catEl = el("category");
+  const listEl = el("scanList");
+  if (!listEl) return;
+  const q = (searchEl ? searchEl.value : "").trim().toLowerCase();
+  const cat = (catEl ? catEl.value : "all");
 
   const items = SCANS.filter(s => {
     const inCat = (cat === "all") || (s.category === cat);
@@ -585,9 +589,6 @@ function renderList(){
     const inSearch = !q || text.includes(q);
     return inCat && inSearch;
   });
-
-  const listEl = el("scanList");
-  if (!listEl) return;
 
   listEl.innerHTML = items.map(s => `
     <div class="scan" data-id="${s.id}">
@@ -606,6 +607,7 @@ function renderList(){
   if (!items.length){
     listEl.innerHTML = `<div class="empty">No scans match this filter. Try <b>All categories</b> or clear the search box.</div>`;
   }
+
 document.querySelectorAll(".scan").forEach(card => {
     card.addEventListener("click", () => {
       const scan = SCANS.find(x => x.id === card.dataset.id);
