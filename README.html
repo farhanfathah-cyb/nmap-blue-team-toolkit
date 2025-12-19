@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick Guide • Nmap Blue Team Toolkit</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <header class="container header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">📘</div>
+      <div>
+        <h1>Quick Guide</h1>
+        <p class="subtitle">How to use and deploy this toolkit</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="btn ghost" href="./index.html">Back to Toolkit</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>What this site does</h2>
+      <p class="muted">Generates Nmap command templates + shows sample outputs for learning. It does not run scans.</p>
+
+      <div class="divider"></div>
+
+      <h2>How to use</h2>
+      <ol class="bullets">
+        <li>Enter a target (IP / hostname / CIDR).</li>
+        <li>Select a scan from the library.</li>
+        <li>Copy the command and run it only in an authorized environment.</li>
+        <li>Use the sample output + SOC notes to interpret findings.</li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <h2>Deploy on GitHub Pages</h2>
+      <ol class="bullets">
+        <li>Create a GitHub repository and upload all files.</li>
+        <li>Go to Settings → Pages.</li>
+        <li>Select “Deploy from a branch” → main → /(root).</li>
+        <li>Save. Wait for the Pages URL to appear.</li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <h2>Customize scans</h2>
+      <p class="muted">Edit <code>assets/scans.json</code> to add scans, sample outputs, meanings, and next steps.</p>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <p><a href="./index.html">Back</a> • Authorized use only</p>
+  </footer>
+</body>
+</html>
