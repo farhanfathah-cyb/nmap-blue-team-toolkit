@@ -63,27 +63,39 @@
         <div class="pill" style="margin-bottom:10px;">🎯 Target Setup</div>
 
         <label class="small muted">Target</label>
-        <input id="target" class="input" type="text"
-               placeholder="e.g., 192.168.1.10 or 10.0.0.0/24"
-               style="width:100%" />
+<input id="target" class="input" type="text"
+       placeholder="e.g., 192.168.1.10 or 10.0.0.0/24"
+       style="width:100%"/>
 
-        <div class="row" style="gap:8px; flex-wrap:wrap; margin-top:10px;">
-          <span class="muted small">Quick examples:</span>
-          <button type="button" class="btn ghost small" onclick="document.getElementById('target').value='192.168.1.10'; document.getElementById('target').dispatchEvent(new Event('input'));">
-            192.168.1.10
-          </button>
-          <button type="button" class="btn ghost small" onclick="document.getElementById('target').value='10.0.0.0/24'; document.getElementById('target').dispatchEvent(new Event('input'));">
-            10.0.0.0/24
-          </button>
-          <button type="button" class="btn ghost small" onclick="document.getElementById('target').value='example.com'; document.getElementById('target').dispatchEvent(new Event('input'));">
-            example.com
-          </button>
-        </div>
+<!-- ✅ NEW: live status row -->
+<div class="row space" style="margin-top:10px; align-items:center;">
+  <div class="row" style="gap:8px; align-items:center;">
+    <span class="pill" id="targetType" style="padding:4px 10px;">—</span>
+    <span class="muted small" id="targetHint">Type a target to validate…</span>
+  </div>
+  <span class="muted small" id="targetSaved">Not saved yet</span>
+</div>
 
-        <p class="muted small mt">
-          ✅ Allowed: letters, numbers, dot, dash, CIDR<br/>
-          ❌ Blocked: spaces and special shell characters (for safety)
-        </p>
+<div class="row" style="gap:8px; flex-wrap:wrap; margin-top:10px;">
+  <span class="muted small">Quick examples:</span>
+  <button type="button" class="btn ghost small"
+    onclick="document.getElementById('target').value='192.168.1.10'; document.getElementById('target').dispatchEvent(new Event('input'));">
+    192.168.1.10
+  </button>
+  <button type="button" class="btn ghost small"
+    onclick="document.getElementById('target').value='10.0.0.0/24'; document.getElementById('target').dispatchEvent(new Event('input'));">
+    10.0.0.0/24
+  </button>
+  <button type="button" class="btn ghost small"
+    onclick="document.getElementById('target').value='example.com'; document.getElementById('target').dispatchEvent(new Event('input'));">
+    example.com
+  </button>
+</div>
+
+<p class="muted small mt">
+  ✅ Allowed: letters, numbers, dot, dash, CIDR<br/>
+  ❌ Blocked: spaces and special shell characters (for safety)
+</p>
 
         <div class="card" style="margin-top:14px; padding:12px;">
           <div class="row space">
