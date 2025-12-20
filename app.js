@@ -569,6 +569,52 @@ function bind(){
   // hydrate target
   const tEl=el("target");
   if(tEl){ tEl.value=getTarget(); tEl.addEventListener("input",()=>setTarget(tEl.value)); tEl.addEventListener("change",()=>setTarget(tEl.value)); }
+  // ✅ Target page: live validation UI (does not change storage logic)
+  const hintEl = el("targetHint");
+  const typeEl = el("targetType");
+  const savedEl = el("targetSaved");
+  const inputEl = el("target");
+
+  const classifyTarget = (t) => {
+    const s = (t || "").trim();
+    if (!s) return { ok:false, type:"—", msg:"Type a target to validate…" };
+
+    // must match your existing escapeForShell allowlist
+    const safe = /^[a-zA-Z0-9.\-_:\/]+$/.test(s);
+    if (!safe) return { ok:false, type:"Invalid", msg:"Blocked characters detected (spaces/shell chars)." };
+
+    // simple type tags
+    if (/^\d{1,3}(\.\d{1,3}){3}\/\d{1,2}$/.test(s)) return { ok:true, type:"CIDR", msg:"Looks like a CIDR range. Scope carefully." };
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(s)) return { ok:true, type:"IP", msg:"Single IP target. Good for quick baselines." };
+    return { ok:true, type:"Host", msg:"Hostname target. Ensure DNS is correct or use -n." };
+  };
+
+  const updateTargetUI = () => {
+    if (!inputEl) return;
+    const val = inputEl.value || "";
+    const r = classifyTarget(val);
+
+    if (typeEl) typeEl.textContent = r.type;
+    if (hintEl) {
+      hintEl.textContent = (r.ok ? "✅ " : "⚠️ ") + r.msg;
+      hintEl.classList.toggle("good", !!r.ok);
+      hintEl.classList.toggle("bad", !r.ok);
+    }
+    if (inputEl) {
+      inputEl.classList.toggle("good", !!r.ok && !!val.trim());
+      inputEl.classList.toggle("bad", !r.ok && !!val.trim());
+    }
+    if (savedEl) {
+      const stored = localStorage.getItem(STORE.target) || "";
+      savedEl.textContent = stored ? "Saved locally ✅" : "Not saved yet";
+    }
+  };
+
+  if (inputEl) {
+    inputEl.addEventListener("input", updateTargetUI);
+    inputEl.addEventListener("change", updateTargetUI);
+    setTimeout(updateTargetUI, 0);
+  }
 
   // settings
   ["useSudo","saveOutputs","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"].forEach(id=>{ const c=el(id); if(!c) return; c.checked=getSetting(id); c.onchange=()=>setSetting(id,c.checked); });
