@@ -440,6 +440,14 @@ async function copyText(text){
   catch{ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
 }
 
+  // ✅ Reset saved settings + custom args (Builder UI)
+  const resetBtn = el("resetPrefs");
+  if (resetBtn) resetBtn.onclick = () => {
+    localStorage.removeItem(STORE.settings);   // nmap_settings_v1
+    localStorage.removeItem(STORE.customArgs); // nmap_custom_args_v1
+    location.reload();
+  };
+
 const HIST_KEY="nmap_blue_team_history_v1";
 function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||"[]"); }catch{ return []; } }
 function saveHistory(list){ localStorage.setItem(HIST_KEY, JSON.stringify(list)); }
@@ -564,6 +572,22 @@ function bind(){
 
   // settings
   ["useSudo","saveOutputs","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"].forEach(id=>{ const c=el(id); if(!c) return; c.checked=getSetting(id); c.onchange=()=>setSetting(id,c.checked); });
+  // ✅ Builder: refresh command live when prefs change
+  const refreshCmd = () => {
+    const scan = state.selected || findScanById(getSelectedScanId());
+    if (scan && el("cmd")) el("cmd").textContent = buildCommand(scan);
+  };
+
+  ["useSudo","saveOutputs","noDNS","treatUp","t2","maxRate","maxRetries","hostTimeout"].forEach(id=>{
+    const c = el(id);
+    if(!c) return;
+    c.addEventListener("change", refreshCmd);
+       // ✅ Enable custom args live update on Builder (safe)
+  if (typeof ensureBuilderLiveUpdate === "function") {
+    ensureBuilderLiveUpdate();
+  }
+
+  });
 
   if(el("search")) el("search").oninput=renderList;
   if(el("category")) el("category").onchange=renderList;
