@@ -15,13 +15,13 @@
       <div>
         <h1>Nmap Blue Team Toolkit</h1>
         <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-</div>
+      </div>
     </div>
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
       <a class="link" href="resume.html">Resume</a>
-      
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
       <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
     <nav class="nav" aria-label="Site navigation">
@@ -35,8 +35,8 @@
     </nav>
   </header>
 </header>
-<main class="wrap">
 
+<main class="wrap">
 <section class="card">
   <div class="row space">
     <div>
@@ -48,19 +48,59 @@
       <a class="btn primary" href="results.html">Next: Results &amp; SOC →</a>
     </div>
   </div>
+
   <div class="two">
     <div>
       <div class="pill" id="selectedScan">No scan selected</div>
       <p class="muted mt"><b>Details:</b> <span id="scanDetails">Select a scan to see details…</span></p>
       <p class="muted"><b>Mapping:</b> <span id="mapping">Select a scan to see mapping…</span></p>
-      
+
       <pre id="cmd">Select a scan to generate a command…</pre>
+
       <div class="row">
         <button id="copyCmd" class="btn primary">Copy Command</button>
         <a class="btn ghost" href="target.html">Edit Target</a>
       </div>
+
       <p class="muted small mt">Note: Commands are generated only when a safe-looking target is set.</p>
+
+      <!-- ✅ NEW: Safety / Preferences (clean UI) -->
+      <hr class="mt">
+
+      <div class="row space mt">
+        <h3 style="margin:0;">Safety / Preferences</h3>
+        <button id="resetPrefs" class="btn ghost" type="button" title="Clear saved settings">Reset</button>
+      </div>
+
+      <p class="muted small" style="margin-top:6px;">
+        Your selections are saved locally in this browser for convenience.
+      </p>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+        <label class="muted"><input type="checkbox" id="useSudo"> Use sudo (Linux)</label>
+        <label class="muted"><input type="checkbox" id="noDNS"> -n (No DNS)</label>
+
+        <label class="muted"><input type="checkbox" id="treatUp"> -Pn (Treat hosts as up)</label>
+        <label class="muted"><input type="checkbox" id="t2"> -T2 (Polite timing)</label>
+
+        <label class="muted"><input type="checkbox" id="maxRate"> --max-rate 100</label>
+        <label class="muted"><input type="checkbox" id="maxRetries"> --max-retries 2</label>
+
+        <label class="muted"><input type="checkbox" id="hostTimeout"> --host-timeout 2m</label>
+        <label class="muted"><input type="checkbox" id="saveOutputs"> Save outputs to History when copying output</label>
+      </div>
+
+      <div class="mt" style="margin-top:14px;">
+        <label class="muted small"><b>Custom args (optional)</b></label>
+        <input id="customArgs" type="text" placeholder="e.g., --reason --defeat-rst-ratelimit"
+               style="width:100%; margin-top:6px;" />
+        <p class="muted small" style="margin-top:6px;">
+          Tip: Only safe characters are accepted.
+        </p>
+      </div>
+      <!-- ✅ END NEW -->
     </div>
+
     <div>
       <h3>Blue Team Notes</h3>
       <div class="kv">
@@ -77,6 +117,7 @@
   <a class="link" href="#" id="quickGuide">Quick Guide</a>
 </footer>
 </main>
+
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-card">
     <div class="row space">
@@ -90,6 +131,7 @@
     <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
   </div>
 </div>
+
 <script src="app.js?v=v6"></script>
 </body>
 </html>
