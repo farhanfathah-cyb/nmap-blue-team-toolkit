@@ -6,24 +6,28 @@
   <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah</title>
   <link rel="stylesheet" href="styles.css?v=v6" />
 </head>
+
 <body data-page="target">
 <header class="hero">
   <div class="hero-overlay"></div>
+
   <header class="top">
     <div class="brand">
       <div class="shield">🛡️</div>
       <div>
         <h1>Nmap Blue Team Toolkit</h1>
         <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-</div>
+      </div>
     </div>
+
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
       <a class="link" href="resume.html">Resume</a>
-      
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
       <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
+
     <nav class="nav" aria-label="Site navigation">
       <a href="index.html" data-nav="index">Dashboard</a>
       <a href="target.html" data-nav="target">Target</a>
@@ -35,35 +39,106 @@
     </nav>
   </header>
 </header>
+
 <main class="wrap">
 
-<section class="card">
-  <div class="row space">
-    <div>
-      <h2>Target</h2>
-      <p class="muted">Set a target (IP / hostname / CIDR). Stored locally in your browser for convenience.</p>
+  <section class="card">
+    <div class="row space">
+      <div>
+        <h2>Set Your Target</h2>
+        <p class="muted">
+          Enter an IP, hostname, or CIDR range. Saved locally in your browser for convenience.
+        </p>
+      </div>
+      <div class="wizard-nav">
+        <a class="btn ghost" href="index.html">← Back: Dashboard</a>
+        <a class="btn primary" href="scans.html">Next: Scan Library →</a>
+      </div>
     </div>
-    <div class="wizard-nav">
-      <a class="btn ghost" href="index.html">← Back: Dashboard</a>
-      <a class="btn primary" href="scans.html">Next: Scan Library →</a>
-    </div>
-  </div>
-  <div class="two">
-    <div>
-      <label class="small muted">Target</label>
-      <input id="target" class="input" type="text" placeholder="e.g., 192.168.1.10 or 10.0.0.0/24" style="width:100%"/>
-      <p class="muted small mt">Tip: Only safe characters are accepted for command generation (letters, numbers, dot, dash, CIDR).</p>
-    </div>
-    
-    </div>
-  </div>
-</section>
 
-<footer class="foot">
-  © Farhan Mohammed Fathah • Built for authorized security testing and education •
-  <a class="link" href="#" id="quickGuide">Quick Guide</a>
-</footer>
+    <div class="two">
+
+      <!-- LEFT: Target input (main) -->
+      <div>
+        <div class="pill" style="margin-bottom:10px;">🎯 Target Setup</div>
+
+        <label class="small muted">Target</label>
+        <input id="target" class="input" type="text"
+               placeholder="e.g., 192.168.1.10 or 10.0.0.0/24"
+               style="width:100%" />
+
+        <div class="row" style="gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <span class="muted small">Quick examples:</span>
+          <button type="button" class="btn ghost small" onclick="document.getElementById('target').value='192.168.1.10'; document.getElementById('target').dispatchEvent(new Event('input'));">
+            192.168.1.10
+          </button>
+          <button type="button" class="btn ghost small" onclick="document.getElementById('target').value='10.0.0.0/24'; document.getElementById('target').dispatchEvent(new Event('input'));">
+            10.0.0.0/24
+          </button>
+          <button type="button" class="btn ghost small" onclick="document.getElementById('target').value='example.com'; document.getElementById('target').dispatchEvent(new Event('input'));">
+            example.com
+          </button>
+        </div>
+
+        <p class="muted small mt">
+          ✅ Allowed: letters, numbers, dot, dash, CIDR<br/>
+          ❌ Blocked: spaces and special shell characters (for safety)
+        </p>
+
+        <div class="card" style="margin-top:14px; padding:12px;">
+          <div class="row space">
+            <b>Privacy &amp; Safety</b>
+            <span class="muted small">Local-only</span>
+          </div>
+          <p class="muted small" style="margin-top:8px;">
+            Your target is stored <b>only in this browser</b> (localStorage) to help you build commands faster.
+            This website does not run any scan.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: What’s next / tips -->
+      <div>
+        <div class="pill" style="margin-bottom:10px;">🧭 What’s Next?</div>
+
+        <div class="kv">
+          <b>Step 1</b>
+          <div class="muted">Set a target here (single host or approved range).</div>
+
+          <b>Step 2</b>
+          <div class="muted">Go to <b>Scan Library</b> and pick a defensive scan template.</div>
+
+          <b>Step 3</b>
+          <div class="muted">Use <b>Command Builder</b> to copy the command with your saved safety preferences.</div>
+        </div>
+
+        <div class="card" style="margin-top:14px; padding:12px;">
+          <b>Good practice</b>
+          <ul class="muted small" style="margin:8px 0 0 18px;">
+            <li>Use a lab network or systems you own / have permission to test.</li>
+            <li>Start with discovery or baseline scans before deeper scripts.</li>
+            <li>Save results as evidence for reporting &amp; comparisons.</li>
+          </ul>
+        </div>
+
+        <div class="row" style="margin-top:14px; gap:10px; flex-wrap:wrap;">
+          <a class="btn ghost" href="scans.html">Browse scans</a>
+          <a class="btn primary" href="builder.html">Open builder</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="foot">
+    © Farhan Mohammed Fathah • Built for authorized security testing and education •
+    <a class="link" href="#" id="quickGuide">Quick Guide</a>
+  </footer>
+
 </main>
+
+<!-- Legal modal -->
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-card">
     <div class="row space">
@@ -77,6 +152,7 @@
     <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
   </div>
 </div>
+
 <script src="app.js?v=v6"></script>
 </body>
 </html>
