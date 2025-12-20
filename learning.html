@@ -6,6 +6,7 @@
   <title>Nmap Blue Team Toolkit • Farhan Mohammed Fathah</title>
   <link rel="stylesheet" href="styles.css?v=v6" />
 </head>
+
 <body data-page="learning">
 <header class="hero">
   <div class="hero-overlay"></div>
@@ -15,13 +16,12 @@
       <div>
         <h1>Nmap Blue Team Toolkit</h1>
         <p class="brandline">Farhan Mohammed Fathah — Cybersecurity Enthusiast</p>
-</div>
+      </div>
     </div>
     <div class="header-actions">
       <a class="link" href="https://nmap.org/book/man.html" target="_blank" rel="noreferrer">Nmap Manual</a>
       <a class="link" href="resume.html">Resume</a>
-      
-<button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙</button>
       <button id="openLegal" class="btn ghost">Legal Notice</button>
     </div>
     <nav class="nav" aria-label="Site navigation">
@@ -35,33 +35,325 @@
     </nav>
   </header>
 </header>
+
 <main class="wrap">
 
+<!-- ================= LEARNING INTRO ================= -->
 <section class="card">
   <div class="row space">
     <div>
       <h2>Learning</h2>
-      <p class="muted">Learning-only cards explain concepts defenders should recognize. No runnable command presets are generated.</p>
+      <p class="muted">
+        Learning-only cards explain concepts defenders should recognize.
+        <b>No runnable command presets</b> are generated here.
+      </p>
     </div>
     <div class="wizard-nav">
       <a class="btn ghost" href="index.html">← Back: Dashboard</a>
       <a class="btn primary" href="scans.html">Go to Scan Library →</a>
     </div>
   </div>
-  <div id="learningList" class="scan-list"></div>
+
+  <div class="pill" style="margin-top:10px;">
+    📘 Blue Team Learning Path • Beginner → Intermediate → Advanced
+  </div>
+
+  <div class="two" style="margin-top:14px;">
+    <div class="card" style="padding:14px;">
+      <b>Beginner</b>
+      <p class="muted small mt">What scanning is • port states • basic log patterns</p>
+    </div>
+    <div class="card" style="padding:14px;">
+      <b>Intermediate</b>
+      <p class="muted small mt">Timing • DNS • version detection • scripts &amp; fingerprints</p>
+    </div>
+    <div class="card" style="padding:14px;">
+      <b>Advanced</b>
+      <p class="muted small mt">Stealth flags • internal recon • response actions</p>
+    </div>
+    <div class="card" style="padding:14px;">
+      <b>SOC Tip</b>
+      <p class="muted small mt">Correlate by source IP, time window, ports, and target spread.</p>
+    </div>
+  </div>
 </section>
+
+<!-- ================= FILTER + TOPICS (JSON rendered) ================= -->
+<section class="card">
+  <div class="row space">
+    <div>
+      <h3>Core Concepts (Curated)</h3>
+      <p class="muted small">Filter by level and review SOC checklists + quick quiz.</p>
+    </div>
+    <div class="row" style="gap:10px; align-items:center; flex-wrap:wrap;">
+      <span class="muted small">Level:</span>
+      <select id="levelFilter" class="input" style="width:auto; min-width:180px;">
+        <option value="all">All levels</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+      </select>
+      <button id="expandAll" class="btn ghost" type="button">Expand all</button>
+      <button id="collapseAll" class="btn ghost" type="button">Collapse all</button>
+    </div>
+  </div>
+
+  <div id="topicsList" class="scan-list" style="margin-top:12px;"></div>
+</section>
+
+<!-- ================= EXISTING LEARNING FROM SCANS ================= -->
+<section class="card">
+  <div class="row space">
+    <div>
+      <h3>Learning from Scan Library (Concept Cards)</h3>
+      <p class="muted small">Auto-generated from learning-only scans in SCANS.</p>
+    </div>
+    <span class="pill">Auto-generated</span>
+  </div>
+
+  <div id="learningList" class="scan-list" style="margin-top:12px;"></div>
+</section>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // -------------------------
+  // 1) Curated learning topics (JSON)
+  // -------------------------
+  const TOPICS = [
+    {
+      id: "scan_basics",
+      level: "beginner",
+      title: "How Network Scanning Works (Defender View)",
+      summary: "Scanners send probes (TCP/UDP/ICMP) to map hosts and services. This often appears as repeated connection attempts.",
+      mitre: "T1595 • Active Scanning",
+      soc: [
+        "Same source hitting many ports (port sweep)",
+        "Same source hitting many hosts (host sweep)",
+        "Repeated attempts with consistent timing patterns"
+      ],
+      quiz: [
+        { q: "Why do defenders care about scan timing?", a: "Because fast scans are noisy, and slow scans can evade simple alerts." }
+      ]
+    },
+    {
+      id: "port_states",
+      level: "beginner",
+      title: "Port States Explained (Open / Closed / Filtered)",
+      summary: "Filtered usually means firewall/ACL interference. UDP often returns open|filtered because of no response.",
+      mitre: "T1595 • Active Scanning",
+      soc: [
+        "Firewall denies/drops aligned with probe patterns",
+        "Many timeouts (especially UDP) without clear accept/deny",
+        "False sense of safety when results show 'filtered'"
+      ],
+      quiz: [
+        { q: "Does 'filtered' always mean safe?", a: "No. It often means traffic was blocked, not that the service is secure." }
+      ]
+    },
+    {
+      id: "host_discovery",
+      level: "beginner",
+      title: "Host Discovery (Why “Who’s Alive” Matters)",
+      summary: "Attackers often discover live hosts first using ICMP/ARP/TCP before scanning deeper.",
+      mitre: "T1018 (context) • Remote System Discovery / T1595",
+      soc: [
+        "ICMP echo bursts to many IPs",
+        "ARP sweeps on local networks",
+        "Short TCP probes to many hosts without full enumeration"
+      ],
+      quiz: [
+        { q: "Why is host discovery suspicious internally?", a: "Because it can indicate reconnaissance or early lateral movement planning." }
+      ]
+    },
+    {
+      id: "timing_rate",
+      level: "intermediate",
+      title: "Timing & Rate Controls (Fast vs Low-and-Slow)",
+      summary: "Scan speed changes detection. Rate controls can reduce alerts but still reveal patterns over time.",
+      mitre: "T1595 • Active Scanning",
+      soc: [
+        "Spikes in short windows (noisy)",
+        "Small consistent bursts over long windows (stealth)",
+        "Repeating cycles (e.g., every 5–10 minutes)"
+      ],
+      quiz: [
+        { q: "What’s a low-and-slow scan goal?", a: "Avoid threshold-based detection by spreading probes over time." }
+      ]
+    },
+    {
+      id: "dns_visibility",
+      level: "intermediate",
+      title: "DNS & Hostnames (Visibility & Info Leakage)",
+      summary: "DNS queries can reveal internal naming patterns and environment structure. Disabling DNS changes output, not the underlying activity.",
+      mitre: "T1590 (concept) • Gather Victim Network Information",
+      soc: [
+        "Burst of reverse DNS lookups",
+        "Queries for internal subdomains from unusual clients",
+        "Resolver logs showing enumeration patterns"
+      ],
+      quiz: [
+        { q: "Why monitor DNS during recon?", a: "Because DNS often reveals targets, naming conventions, and discovery activity." }
+      ]
+    },
+    {
+      id: "versioning",
+      level: "intermediate",
+      title: "Service & Version Detection (Why It’s Sensitive)",
+      summary: "Version detection uses banners and protocol responses, increasing exposure and traffic fingerprints.",
+      mitre: "T1595 • Active Scanning",
+      soc: [
+        "Banner grabs across multiple protocols",
+        "HTTP header/title requests in bursts",
+        "Repeated protocol handshakes without follow-up sessions"
+      ],
+      quiz: [
+        { q: "Why do versions matter to attackers?", a: "They help identify vulnerable software for exploitation." }
+      ]
+    },
+    {
+      id: "scripts",
+      level: "intermediate",
+      title: "Script Scanning (Default vs Intrusive)",
+      summary: "Scripts can be safe (informational) or heavy (intrusive). Script behavior is easier to fingerprint and alert on.",
+      mitre: "T1595 • Active Scanning",
+      soc: [
+        "Many HTTP paths requested rapidly",
+        "Enumeration patterns against SMB/SSL/SSH",
+        "IDS alerts clustered around script behaviors"
+      ],
+      quiz: [
+        { q: "Do scripts always mean an attack?", a: "Not always—could be authorized assessment. Context and source matter." }
+      ]
+    },
+    {
+      id: "tcp_flags",
+      level: "advanced",
+      title: "Abnormal TCP Flags (NULL / XMAS / ACK)",
+      summary: "Unusual TCP flags test firewall/stack behavior. These patterns are rare in normal business traffic.",
+      mitre: "T1595 • Active Scanning",
+      soc: [
+        "TCP packets with odd flag combinations",
+        "ACK without established state (stateful firewall anomalies)",
+        "IDS signatures for flag anomalies and sweeps"
+      ],
+      quiz: [
+        { q: "Why are abnormal flags valuable for detection?", a: "Because they’re uncommon in normal traffic and often indicate recon." }
+      ]
+    },
+    {
+      id: "internal_vs_external",
+      level: "advanced",
+      title: "Internal vs External Scanning (Severity & Response)",
+      summary: "External scans map perimeter exposure. Internal scans can indicate compromised accounts, malware, or lateral movement.",
+      mitre: "T1046 • Network Service Discovery / T1595",
+      soc: [
+        "Internal host scanning many peers quickly",
+        "New scanner source not in allowlist",
+        "Recon followed by auth attempts or exploit alerts"
+      ],
+      quiz: [
+        { q: "Which is usually higher priority: internal or external recon?", a: "Internal recon—often indicates active compromise or misuse." }
+      ]
+    },
+    {
+      id: "turn_results_into_actions",
+      level: "advanced",
+      title: "Turning Scan Results into Defense Actions",
+      summary: "Use scanning for baselines, exposure review, and hardening plans—not exploitation.",
+      mitre: "Defensive practice (not a MITRE technique)",
+      soc: [
+        "Create baselines and compare over time (drift)",
+        "Prioritize high-risk exposures (admin ports, DB ports)",
+        "Document and track remediation (change management)"
+      ],
+      quiz: [
+        { q: "What’s the most useful defensive output of scanning?", a: "A baseline you can compare after changes, patches, or incidents." }
+      ]
+    }
+  ];
+
+  const topicsList = document.getElementById("topicsList");
+  const levelFilter = document.getElementById("levelFilter");
+  const expandAll = document.getElementById("expandAll");
+  const collapseAll = document.getElementById("collapseAll");
+
+  const esc = (s) => (s || "").replace(/[&<>"']/g, (c) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+
+  const renderTopics = () => {
+    const level = (levelFilter ? levelFilter.value : "all");
+    const items = TOPICS.filter(t => level === "all" ? true : t.level === level);
+
+    if (!topicsList) return;
+
+    topicsList.innerHTML = items.map(t => `
+      <div class="scan" data-topic="${esc(t.id)}">
+        <div class="row space" style="align-items:center;">
+          <div class="title">${esc(t.title)}</div>
+          <span class="pill">${esc(t.level)}</span>
+        </div>
+        <div class="meta">
+          <div><b>Summary:</b> ${esc(t.summary)}</div>
+          <div><b>MITRE:</b> ${esc(t.mitre)}</div>
+
+          <details class="mt" style="margin-top:10px;">
+            <summary><b>SOC checklist</b> (what to look for)</summary>
+            <div class="muted small" style="margin-top:8px;">
+              ${t.soc.map(x => `• ${esc(x)}`).join("<br/>")}
+            </div>
+          </details>
+
+          <details class="mt" style="margin-top:10px;">
+            <summary><b>Quick quiz</b></summary>
+            <div class="muted small" style="margin-top:8px;">
+              ${t.quiz.map(q => `
+                <div style="margin-bottom:10px;">
+                  <div><b>Q:</b> ${esc(q.q)}</div>
+                  <div><b>A:</b> ${esc(q.a)}</div>
+                </div>
+              `).join("")}
+            </div>
+          </details>
+        </div>
+      </div>
+    `).join("");
+
+    if (!items.length) {
+      topicsList.innerHTML = "<div class='muted'>No topics in this filter.</div>";
+    }
+  };
+
+  if (levelFilter) levelFilter.addEventListener("change", renderTopics);
+
+  const setAllDetails = (open) => {
+    if (!topicsList) return;
+    topicsList.querySelectorAll("details").forEach(d => d.open = !!open);
+  };
+  if (expandAll) expandAll.onclick = () => setAllDetails(true);
+  if (collapseAll) collapseAll.onclick = () => setAllDetails(false);
+
+  renderTopics();
+
+  // -------------------------
+  // 2) Existing: auto-learning cards from SCANS.locked
+  // -------------------------
   const list = document.getElementById("learningList");
   if (!list || typeof SCANS === "undefined") return;
-  const items = SCANS.filter(s => s.locked);
-  list.innerHTML = items.map(s => `
+
+  const scanItems = SCANS.filter(s => s.locked);
+  if (!scanItems.length) {
+    list.innerHTML = "<div class='muted'>No learning-only scans available.</div>";
+    return;
+  }
+
+  list.innerHTML = scanItems.map(s => `
     <div class="scan">
-      <div class="title">${s.name}</div>
+      <div class="title">${esc(s.name)}</div>
       <div class="meta">
-        <div><b>Category:</b> ${s.category}</div>
-        <div><b>Tags:</b> ${(s.tags||[]).join(", ")}</div>
-        <div><b>Why it matters:</b> ${s.details}</div>
+        <div><b>Category:</b> ${esc(s.category)}</div>
+        <div><b>Tags:</b> ${(s.tags||[]).map(esc).join(", ")}</div>
+        <div><b>Why it matters:</b> ${esc(s.details)}</div>
       </div>
     </div>
   `).join("");
@@ -73,6 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
   <a class="link" href="#" id="quickGuide">Quick Guide</a>
 </footer>
 </main>
+
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-card">
     <div class="row space">
@@ -86,6 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <p class="muted">Tip: Add your organization’s acceptable-use policy link here.</p>
   </div>
 </div>
+
 <script src="app.js?v=v6"></script>
 </body>
 </html>
